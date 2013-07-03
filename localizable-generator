@@ -1,0 +1,236 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+require 'rubygems'
+require 'erb'
+require 'fileutils'
+require 'micro-optparse'
+require 'google_drive'
+require 'yaml'
+require_relative 'helpers/string'
+require_relative 'helpers/term'
+
+DEFAULT_USER = 'your.user@gmail.com'
+DEFAULT_PASS = 'your_password'
+
+def copy_with_path(src, dst)
+  FileUtils.mkdir_p(File.dirname(dst))
+  FileUtils.cp(src, dst)
+end
+
+def store_credentials(credentials)
+  FileUtils.mkdir_p(Dir.home + '/.locgen/')
+  File.open(Dir.home + '/.locgen/users.yml', 'w+') { |f| f.write credentials.to_yaml }
+end
+
+def recover_credentials
+  our_filename = Dir.home + '/.locgen/users.yml'
+  if File.exist? our_filename
+    YAML::load(File.open(our_filename))
+  else
+    nil
+  end
+end
+
+def show_error(error_string)
+  puts 'Error!'.red
+  puts error_string
+  exit
+end
+
+def process_template(template_name, target_directory, generated_file_name)
+  input_file = File.open("templates/"+template_name, "rb")
+  template = input_file.read
+  input_file.close
+  renderer = ERB.new(template)
+  output = renderer.result()
+  output_file = File.new(generated_file_name, "w")
+  output_file.write(output)
+  output_file.close
+  copy_with_path(generated_file_name, target_directory+generated_file_name)
+  FileUtils.rm(generated_file_name)
+end
+
+# Generation for iOS
+
+def generate_ios(language, target_directory)
+  @current_lang = language
+  process_template 'ios_localizable.erb', target_directory, 'Localizable.strings'
+  puts ' > '+language.yellow
+end
+
+def generate_ios_constants(target_directory)
+  process_template 'ios_constant_localizable.erb', target_directory, 'LocalizableConstants.h'
+  puts ' > '+'LocalizableConstants.h'.yellow
+end
+
+# Generation for Android
+
+def generate_android(language, target_directory)
+  @current_lang = language
+  process_template 'android_localizable.erb', target_directory, 'escape_strings.xml'
+  puts ' > '+language.yellow
+end
+
+# Generation for JSON
+
+def generate_json(languages, target_directory)
+  @langs = languages
+  process_template 'json_localizable.erb', target_directory, 'localizables.json'
+  puts ' > '+languages.join(', ').yellow
+end
+
+# Parsing and commandline checks
+
+show_error 'No parameters specified. Use the flag --help to see them all.' unless ARGV.size > 0
+
+options = Parser.new do |p|
+  p.banner = 'localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>'
+  p.version = '0.1'
+  p.option :username, 'Your Google Drive user', :default => DEFAULT_USER
+  p.option :password, 'Your Google Drive password', :default => DEFAULT_PASS
+  p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
+  p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
+  p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
+  p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
+end.process!
+
+drive_user = options[:username]
+drive_pass = options[:password]
+ios_path = options[:output_ios]
+android_path = options[:output_android]
+json_path = options[:output_json]
+spreadsheet = options[:spreadsheet]
+
+has_ios = ios_path != '/the_path/Localizables/'
+has_android = android_path != '/the_path/res/'
+has_json = json_path != '/the_path/strings/'
+
+if drive_user == DEFAULT_USER && drive_pass == DEFAULT_PASS
+  auth = recover_credentials
+  if auth.nil?
+    print 'Your Google Drive account: '
+    drive_user = gets.chomp
+    print 'Your password:'
+    drive_pass = gets.chomp
+  else
+    drive_user = auth['login']
+    drive_pass = auth['pass']
+  end
+end
+
+show_error 'You must provide a Google Drive user' if drive_user == DEFAULT_USER || drive_user.blank?
+show_error 'You must provide a Google Drive password' if drive_pass == DEFAULT_PASS || drive_pass.blank?
+
+show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || has_json
+
+# Get the spreadsheet from Google Drive
+
+puts 'Logging in to Google Drive...'
+begin
+  session = GoogleDrive.login(drive_user, drive_pass)
+rescue
+  show_error 'Couldn\'t access Google Drive. Check your credentials!'
+end
+
+# Store the login info to a file in our home
+
+drive_auth = Hash.new
+drive_auth['login'] = drive_user
+drive_auth['pass'] = drive_pass
+
+store_credentials drive_auth
+
+# Recover our spreadsheets
+
+puts 'Logged.'.cyan
+puts "Searching for #{spreadsheet}..."
+matching_spreadsheets = []
+
+session.spreadsheets.each do |s|
+  matching_spreadsheets << s if s.title.downcase.include?(spreadsheet.downcase) && s.title.include?('[Localizables]')
+end
+
+if matching_spreadsheets.count > 1
+  puts 'Found:'.cyan
+  matching_spreadsheets.each { |ms| puts ms.title.red }
+  show_error 'More than one match found. You have to be more specific!'
+elsif matching_spreadsheets.count == 0
+  show_error "Unable to find any spreadsheet matching your criteria: #{spreadsheet}"
+end
+
+found_spreadsheet = matching_spreadsheets[0]
+puts "Found one match: #{found_spreadsheet.title}".cyan
+
+# Processing the spreadsheet
+
+puts "Processing #{found_spreadsheet.title}..."
+worksheet = found_spreadsheet.worksheets[0]
+show_error 'Unable to retrieve the first worksheet from the spreadsheet' if worksheet.nil?
+
+first_valid_row_index = nil
+last_valid_row_index = nil
+
+for row in 1..worksheet.max_rows
+  first_valid_row_index = row if worksheet[row, 1].downcase == '[key]'
+  last_valid_row_index = row if worksheet[row, 1].downcase == '[end]'
+end
+
+show_error 'Invalid format: Could not find any [key] keyword in the A column of the first worksheet' if first_valid_row_index.nil?
+show_error 'Invalid format: Could not find any [end] keyword in the A column of the first worksheet' if last_valid_row_index.nil?
+show_error 'Invalid format: [end] must not be before [key] in the A column' if first_valid_row_index > last_valid_row_index
+
+languages = Hash.new('languages')
+default_language = nil
+
+for column in 2..worksheet.max_cols
+  col_text = worksheet[first_valid_row_index, column]
+  default_language = col_text.downcase.gsub('*','') if col_text.include? '*'
+  languages.store col_text.downcase.gsub('*',''), column unless col_text.blank?
+end
+
+puts 'Languages: ' + languages.keys.join(', ').yellow
+
+puts 'Building terminology in memory...'
+
+@terms = []
+first_term_row = first_valid_row_index+1
+last_term_row = last_valid_row_index-1
+
+for row in first_term_row..last_term_row
+  key = worksheet[row, 1]
+  unless key.blank?
+    term = Term.new(key)
+    languages.each do |lang, column_index|
+      term_text = worksheet[row, column_index]
+      term.values.store lang, term_text
+    end
+    @terms << term
+  end
+end
+
+puts 'Loaded.'.cyan
+
+if has_ios
+  puts 'Generating localizable files for ' + 'iOS'.red + '...'
+  generate_ios_constants ios_path
+  languages.keys.each do |lang|
+    output_path = ios_path + "#{lang}.lproj/"
+    generate_ios lang, output_path
+  end
+end
+if has_android
+  puts 'Generating localizable files for ' + 'Android'.green + '...'
+  languages.keys.each do |lang|
+    output_path = android_path + "values-#{lang}/"
+    output_path = android_path + 'values/' if lang == default_language
+    generate_android lang, output_path
+  end
+end
+if has_json
+  puts 'Generating localizable files for ' + 'JSON'.yellow + '...'
+  output_path = json_path + 'strings/'
+  generate_json languages.keys, output_path
+end
+
+puts 'Done! - everything went smoothly :)'.green

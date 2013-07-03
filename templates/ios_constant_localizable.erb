@@ -1,0 +1,22 @@
+/*
+LocalizableConstants.h
+EKGDev
+
+GENERATED - DO NOT MODIFY - use localizable-generator instead.
+
+Created by localizable-generator on <%= Time.now.localtime %>.
+Copyright (c) <%= Time.now.year %> Eli Kohen. All rights reserved.
+*/
+
+#define EKLocalizedString(key) NSLocalizedString(key,nil)
+
+<% @terms.each do |term| %>
+<%
+       if term.restriction == 'i' || term.restriction == nil
+         if term.is_comment?
+%>
+// ---
+<% else %>#define		<%= term.keyword_iphone_constant %>		EKLocalizedString(@"<%= term.keyword_iphone %>")<%
+   end
+   end
+   end %>
