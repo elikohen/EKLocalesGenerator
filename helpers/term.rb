@@ -64,13 +64,17 @@ class Term
     android_values = Hash.new
     @values.each do |language, value|
       new_language = language.gsub('*','')
-      new_value = value.gsub('%i','%d')
-      new_value = new_value.gsub('\?', '')
-      new_value = new_value.gsub(/\n/, '\n')
-      new_value = new_value.gsub("\\\"", '"')
-      new_value = new_value.gsub(/"/, '\"')
-      new_value.gsub!(/[%]\d*[@]/) do |w|
-        w.gsub!('@','s')
+      new_value = value
+      if(!value.start_with?("<![CDATA["))
+        new_value = new_value.gsub('%i','%d')
+        new_value = new_value.gsub('\?', '')
+        new_value = new_value.gsub(/\n/, '\n')
+        new_value = new_value.gsub("\\\"", '"')
+        new_value = new_value.gsub(/"/, '\"')
+        new_value = new_value.gsub('&', '&amp;')
+        new_value.gsub!(/[%]\d*[@]/) do |w|
+          w.gsub!('@','s')
+        end
       end
       android_values.store new_language, new_value
     end
