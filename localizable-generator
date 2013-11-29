@@ -68,7 +68,7 @@ end
 
 def generate_android(language, target_directory)
   @current_lang = language
-  process_template 'android_localizable.erb', target_directory, 'escape_strings.xml'
+  process_template 'android_localizable.erb', target_directory, 'gen_strings.xml'
   puts ' > '+language.yellow
 end
 

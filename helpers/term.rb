@@ -70,6 +70,7 @@ class Term
         new_value = new_value.gsub('\?', '')
         new_value = new_value.gsub(/\n/, '\n')
         new_value = new_value.gsub("\\\"", '"')
+        new_value = new_value.gsub("'","\\\\'")
         new_value = new_value.gsub(/"/, '\"')
         new_value = new_value.gsub('&', '&amp;')
         new_value.gsub!(/[%]\d*[@]/) do |w|
