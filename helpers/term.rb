@@ -75,6 +75,7 @@ class Term
         new_value.gsub!(/[%]\d*[@]/) do |w|
           w.gsub!('@','s')
         end
+        new_value = new_value.gsub('...', '&#8230;')
       end
       android_values.store new_language, new_value
     end
