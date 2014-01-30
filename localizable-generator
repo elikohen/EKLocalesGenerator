@@ -68,7 +68,7 @@ end
 
 def generate_android(language, target_directory)
   @current_lang = language
-  process_template 'android_localizable.erb', target_directory, 'gen_strings.xml'
+  process_template 'android_localizable.erb', target_directory, 'gen-strings.xml'
   puts ' > '+language.yellow
 end
 
@@ -82,7 +82,7 @@ end
 
 #Prints on screen all the unused keys and also marks that keys on spreadsheet as unused
 def check_unused_ios(worksheet, from_row, to_row, target_directory, mark)
-  puts 'UNUSED KEYS:'
+  puts "\nUNUSED IOS KEYS:"
   for row in from_row..to_row
     key = worksheet[row, 1]
     unless key.blank?
@@ -109,11 +109,46 @@ def check_unused_ios(worksheet, from_row, to_row, target_directory, mark)
 end
 
 def find_text_on_ios_files(path,text)
-  # print "#{command}... "
   output = `find #{path} -type f -name *.m -exec grep -li \"#{text}\" {} +`
-  output += `find ../.. -type f -name *.h ! -name *LocalizableConstants.h -exec grep -li \"#{text}\" {} +`
+  output += `find #{path} -type f -name *.h ! -name *LocalizableConstants.h -exec grep -li \"#{text}\" {} +`
   return output
- end
+end
+
+#Prints on screen all the unused keys and also marks that keys on spreadsheet as unused
+def check_unused_android(worksheet, from_row, to_row, target_directory, mark)
+  puts "\nUNUSED ANDROID KEYS:"
+  for row in from_row..to_row
+    key = worksheet[row, 1]
+    unless key.blank?
+      term = Term.new(key)
+      if term.restriction == 'a' || term.restriction == nil
+        if !term.is_comment?
+          result = find_text_on_android_files(target_directory,term.keyword_android)
+          if(result.length == 0)
+            puts term.keyword_android
+            if(mark)
+              #modifiying key on spreadsheet by prepending [u] to mark key as unused
+              worksheet[row, 1] = '[u]'+key
+            end
+          end
+        else
+          puts "\n==> Group:"
+        end
+      end
+    end
+  end
+  if(mark)
+    worksheet.save()
+  end
+end
+
+def find_text_on_android_files(path,string_key)
+  command = "find #{path} -type f -name '*.java' ! -name R.java -exec grep -li \"R.string.#{string_key}\" {} +"
+  output = `#{command}`
+  command = "find #{path} -type f -name '*.xml' ! -name gen-strings.xml -exec grep -li \"@string\/#{string_key}\" {} +"
+  output += `#{command}`
+  return output
+end
 
 # Parsing and commandline checks
 
@@ -257,16 +292,12 @@ if has_ios
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
   end
-
-  # if(check_unused)
-  #   check_unused_ios(languages.keys[0],ios_path)
-  # end
 end
 if has_android
   puts 'Generating localizable files for ' + 'Android'.green + '...'
   languages.keys.each do |lang|
-    output_path = android_path + "values-#{lang}/"
-    output_path = android_path + 'values/' if lang == default_language
+    output_path = android_path + "res/values-#{lang}/"
+    output_path = android_path + 'res/values/' if lang == default_language
     generate_android lang, output_path
   end
 end
@@ -280,7 +311,12 @@ puts 'Done! - Locale generation went smoothly :)'.green
 
 if(check_unused)
   puts 'Checking unused'
-  check_unused_ios(worksheet, first_term_row, last_term_row, ios_path, check_unused_mark)
+  if(has_ios)
+    check_unused_ios(worksheet, first_term_row, last_term_row, ios_path, check_unused_mark)
+  end
+  if(has_android)
+    check_unused_android(worksheet, first_term_row, last_term_row, android_path, check_unused_mark)
+  end
 end
 
 
