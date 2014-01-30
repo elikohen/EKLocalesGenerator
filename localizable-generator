@@ -80,20 +80,28 @@ def generate_json(languages, target_directory)
   puts ' > '+languages.join(', ').yellow
 end
 
-def check_unused_ios(lang, target_directory)
+#Prints on screen all the unused keys and also marks that keys on spreadsheet as unused
+def check_unused_ios(worksheet, from_row, to_row, target_directory)
   puts 'UNUSED KEYS:'
-  @terms.each do |term|
-    if term.restriction == 'i' || term.restriction == nil
-      if !term.is_comment?
-        result = find_text_on_ios_files(target_directory,term.keyword_iphone_constant)
-        if(result.length == 0)
-          puts term.keyword_iphone_constant
+  for row in from_row..to_row
+    key = worksheet[row, 1]
+    unless key.blank?
+      term = Term.new(key)
+      if term.restriction == 'i' || term.restriction == nil
+        if !term.is_comment?
+          result = find_text_on_ios_files(target_directory,term.keyword_iphone_constant)
+          if(result.length == 0)
+            puts term.keyword_iphone_constant
+            #modifiying key on spreadsheet by prepending [u] to mark key as unused
+            worksheet[row, 1] = '[u]'+key
+          end
+        else
+          puts "\n==> Group:"
         end
-      else
-        puts "\n==> Group: #{term.values[lang]}"
       end
     end
-  end 
+  end
+  worksheet.save()
 end
 
 def find_text_on_ios_files(path,text)
@@ -244,9 +252,9 @@ if has_ios
     generate_ios lang, output_path
   end
 
-  if(check_unused)
-    check_unused_ios(languages.keys[0],ios_path)
-  end
+  # if(check_unused)
+  #   check_unused_ios(languages.keys[0],ios_path)
+  # end
 end
 if has_android
   puts 'Generating localizable files for ' + 'Android'.green + '...'
@@ -262,4 +270,12 @@ if has_json
   generate_json languages.keys, output_path
 end
 
-puts 'Done! - everything went smoothly :)'.green
+puts 'Done! - Locale generation went smoothly :)'.green
+
+if(check_unused)
+  puts 'Checking unused'
+  check_unused_ios(worksheet, first_term_row, last_term_row, ios_path)
+end
+
+
+
