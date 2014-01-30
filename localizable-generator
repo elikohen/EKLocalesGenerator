@@ -81,7 +81,7 @@ def generate_json(languages, target_directory)
 end
 
 #Prints on screen all the unused keys and also marks that keys on spreadsheet as unused
-def check_unused_ios(worksheet, from_row, to_row, target_directory)
+def check_unused_ios(worksheet, from_row, to_row, target_directory, mark)
   puts 'UNUSED KEYS:'
   for row in from_row..to_row
     key = worksheet[row, 1]
@@ -92,8 +92,10 @@ def check_unused_ios(worksheet, from_row, to_row, target_directory)
           result = find_text_on_ios_files(target_directory,term.keyword_iphone_constant)
           if(result.length == 0)
             puts term.keyword_iphone_constant
-            #modifiying key on spreadsheet by prepending [u] to mark key as unused
-            worksheet[row, 1] = '[u]'+key
+            if(mark)
+              #modifiying key on spreadsheet by prepending [u] to mark key as unused
+              worksheet[row, 1] = '[u]'+key
+            end
           end
         else
           puts "\n==> Group:"
@@ -101,7 +103,9 @@ def check_unused_ios(worksheet, from_row, to_row, target_directory)
       end
     end
   end
-  worksheet.save()
+  if(mark)
+    worksheet.save()
+  end
 end
 
 def find_text_on_ios_files(path,text)
@@ -124,7 +128,8 @@ options = Parser.new do |p|
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
-  p.option :check_unused, 'Whether to check unused keys on project', :default => 'no' , :short => 'c'
+  p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
+  p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
 end.process!
 
 drive_user = options[:username]
@@ -133,7 +138,8 @@ ios_path = options[:output_ios]
 android_path = options[:output_android]
 json_path = options[:output_json]
 spreadsheet = options[:spreadsheet]
-check_unused = options[:check_unused] != 'no'
+check_unused = options[:check_unused]
+check_unused_mark = options[:check_unused_mark]
 
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
@@ -274,7 +280,7 @@ puts 'Done! - Locale generation went smoothly :)'.green
 
 if(check_unused)
   puts 'Checking unused'
-  check_unused_ios(worksheet, first_term_row, last_term_row, ios_path)
+  check_unused_ios(worksheet, first_term_row, last_term_row, ios_path, check_unused_mark)
 end
 
 
