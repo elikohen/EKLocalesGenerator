@@ -80,6 +80,29 @@ def generate_json(languages, target_directory)
   puts ' > '+languages.join(', ').yellow
 end
 
+def check_unused_ios(lang, target_directory)
+  puts 'UNUSED KEYS:'
+  @terms.each do |term|
+    if term.restriction == 'i' || term.restriction == nil
+      if !term.is_comment?
+        result = find_text_on_ios_files(target_directory,term.keyword_iphone_constant)
+        if(result.length == 0)
+          puts term.keyword_iphone_constant
+        end
+      else
+        puts "\n==> Group: #{term.values[lang]}"
+      end
+    end
+  end 
+end
+
+def find_text_on_ios_files(path,text)
+  # print "#{command}... "
+  output = `find #{path} -type f -name *.m -exec grep -li \"#{text}\" {} +`
+  output += `find ../.. -type f -name *.h ! -name *LocalizableConstants.h -exec grep -li \"#{text}\" {} +`
+  return output
+ end
+
 # Parsing and commandline checks
 
 show_error 'No parameters specified. Use the flag --help to see them all.' unless ARGV.size > 0
@@ -93,6 +116,7 @@ options = Parser.new do |p|
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
+  p.option :check_unused, 'Whether to check unused keys on project', :default => 'no' , :short => 'c'
 end.process!
 
 drive_user = options[:username]
@@ -101,6 +125,7 @@ ios_path = options[:output_ios]
 android_path = options[:output_android]
 json_path = options[:output_json]
 spreadsheet = options[:spreadsheet]
+check_unused = options[:check_unused] != 'no'
 
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
@@ -217,6 +242,10 @@ if has_ios
   languages.keys.each do |lang|
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
+  end
+
+  if(check_unused)
+    check_unused_ios(languages.keys[0],ios_path)
   end
 end
 if has_android
