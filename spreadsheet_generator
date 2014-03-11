@@ -79,9 +79,24 @@ def read_from_ios(language, file, terms, create)
       key = uglyKey[/\"(.*?)\"/m, 1]
       value = uglyValue[/\"(.*?)\"/m, 1]
       puts "Data line #{key},#{value}"
+
+      #searching for same key
       term = ReadTerm.new(key)
+      found = false
+      terms.each do |theTerm|
+        if theTerm.keyword == term.keyword
+          term = theTerm
+          found = true
+          break
+        end
+      end
+
+      #if key not found create new one
+      if !found
+        terms << term
+      end
+      # adding value to term
       term.add_value(language, value)
-      terms << term
     end
   end
 end

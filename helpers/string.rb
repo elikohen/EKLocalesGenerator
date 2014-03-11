@@ -49,6 +49,15 @@ class String
     new_string.split('_').map{|e| e.capitalize}.join(" ")
   end
 
+  def words_separate_ywp
+    new_string = String.new(self)
+    if new_string[0,1] == "_"
+      new_string = new_string[1..-1]
+    end
+    # new_string = new_string.split(/(?=[A-Z])/).join("_")
+    new_string.split('_').map{|e| e.capitalize}.join(" ")
+  end
+
   def uncapitalize
     self[0, 1].downcase + self[1..-1]
   end
