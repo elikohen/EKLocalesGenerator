@@ -48,8 +48,7 @@ class Term
     iphone_values = Hash.new
     @values.each do |language, value|
       new_language = language.gsub('*','')
-      new_value = value.gsub('%d','%i')
-      new_value = new_value.gsub(/\n/, '\n')
+      new_value = value.gsub(/\n/, '\n')
       new_value = new_value.gsub("\\\"", '"')
       new_value = new_value.gsub(/"/, '\"')
       new_value.gsub!(/[%]\d*[s]/) do |w|
