@@ -76,6 +76,9 @@ class Term
           w.gsub!('@','s')
         end
         new_value = new_value.gsub('...', '&#8230;')
+        if(new_value == '?')
+          new_value = "\"?\""
+        end
       end
       android_values.store new_language, new_value
     end
