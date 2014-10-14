@@ -1,29 +1,27 @@
 Localization Utils
 ==================
+Utility set to help on language localisation of Android and iOS apps.
 
-Utilidades para ayudar a la localización lingüística de nuestras aplicaciones.
+* **localizable-generator:** Will generate strings.xml files for Android and all Localizable.strings for iOS from a Google Drive Spreadsheet data.
+* **spreadsheet-generator:** Will populate a Google Drive Spreadsheet reading from Android strings.xml or iOS Localizable.strings files.
 
-* localizable-generator: se utiliza para crear los archivos strings.xml de Android o Localizable.strings de iOS a partir de una hoja de cálculo de Google Drive.
+Installation
+------------
+Ruby >= 1.9.3 is required. If you require installing it and don't know how to do it, try with [RVM](https://rvm.io/rvm/install/).
 
-Instalación
------------
-
-Es necesario tener ruby 1.9.3 como mínimo instalado. Si no sabes cómo instalarlo, prueba usando [RVM](https://rvm.io/rvm/install/).
-
-Para poder usar este script tienes que ejecutar primero en el directorio:
+In order to use the scripts, all the required gems must be installed, so type this on the root folder:
 
 	bundle install
 
-Esto te instalará las dependencias necesarias.
+It will install all dependencies.
 
-Uso del localizable-generator
------------------------------
+localizable-generator Usage
+---------------------------
 
-Se ejecuta pasando una serie de parámetros por línea de comandos. Os pego:
+Those are the generator parameters, you can show all them by typing -h
 
-    localizable-generator (c) 2013 Eli Kohen <elikohen@gmail.com>
-    -u your.user@gmail.com,          Your Google Drive user
-        --username
+    localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>
+    -u, --username your.user@gmail.com		Your Google Drive user
     -p, --password your_password     Your Google Drive password
     -s example-spreadsheet,          Spreadsheet containing the localization info
         --spreadsheet
@@ -33,45 +31,49 @@ Se ejecuta pasando una serie de parámetros por línea de comandos. Os pego:
         --output-android
     -j /the_path/strings/,           Path to the JSON localization directory
         --output-json
+    -c, --[no-]check-unused          Whether to check unused keys on project
+    -m, --[no-]check-unused-mark     If checking keys -> mark them on spreadsheet prepending [u]
     -h, --help                       Show this message
     -v, --version                    Print version
 
-Que igual os parece chungo, pero si lo explico seguro que no :)
+It might sound weird or difficult but I'll explain them
 
-- El username y el password son los de vuestra cuenta de mmip. Una vez hayáis metido los valores, se guardan en local y no hace falta introducirlos más. Si no los introducís la primera vez, la aplicación os lo solicitará.
-- El campo spreadsheet es una parte del nombre de la hoja de cálculo, sin el [Localizables]. Por ejemplo, en el caso de radares, la hoja de cálculo se llama "[Localizables] Radares: AvisaMe" y aquí bastaría con poner "radares" o "avisame".
-- Las rutas de iOS, Android y JSON: debe haber por lo menos una. En el caso de iOS marcamos el directorio raíz donde están los localizables, normalmente lo ponemos en /Classes/Resources/Localizables. En el caso de Android tenemos que poner el directorio /res del proyecto. En el caso de JSON, marcamos un directorio base del que creará el programa un /strings/localizable.json con todos los datos.
-- Si queréis que un localizable sólo esté en una plataforma, poned al principio de la key [a] para Android, [i] para iOS o [j] para JSON, solo en el caso de que se exporte para más de una plataforma.
+- **Username and password** are the ones you use for gmail (maybe if you're using 2factor authentication it won't work...). Those values are required just for the first time, and get stored locally so that the next times the script reuses them.
+- **Spreadsheet name** is part of the spreadsheet name without the [Localizables] token. For instance if the spreadsheet is called *[Localizables] Ztory* you can type just *Ztory* on this parameter.
+- **iOS, Android and JSON paths:** It must be at least one of this parameters. In case of iOS it should point to the folder where are the Localizables.strings, on android it should point to the .../res folder.
+- **check-unused** It shows a list of all keys that are not used on the project (it can provide false positives if you concatenate strings to access them).
+- **check-unused-mark** when checking unused if this parameter is provided, the script will prepend [u] to each unused key on the google spreadsheet so that in the next generation it won't be generated.
+- *trick:* If you want one of the keys (spreadsheet row) just for one of the platforms, just type [i], [a] or [j] as a prefix for the key.
 
-Lo veréis más sencillo con un ejemplo. 
+An example will show everything better. 
 
-Esto generaría sólo los de iOS de radares.
+This will generate just iOS localisables of a "radares" app.
 
-	localizable-generator -u pepe@mmip.es -p pepepepe -s radares -i /Users/mrm/Documents/workspace/Radares-iOS/Radares/Resources/Localizables
+	localizable-generator -u pepe@gmail.com -p pepepepe -s radares -i /Users/mrm/Documents/workspace/Radares-iOS/Radares/Resources/Localizables
 
-Y esto generaría los de iOS y Android.
+And this will generate both iOS and Android
 
-	localizable-generator -u pepe@mmip.es -p pepepepe -s radares -i /Users/mrm/Documents/workspace/Radares-iOS/Radares/Resources/Localizables -a /Users/mrm/Documents/workspace/Radares-Android/res
+	localizable-generator -u pepe@gmail.com -p pepepepe -s radares -i /Users/mrm/Documents/workspace/Radares-iOS/Radares/Resources/Localizables -a /Users/mrm/Documents/workspace/Radares-Android/res
 
 
-La hoja de cálculo en Google Drive
+Google Drive spreadseet
 ----------------------------------
 
-Repito lo de antes, podéis ver un ejemplo en: https://docs.google.com/spreadsheet/ccc?key=0AjxU4FKmsSr8dDBUa0dNYThxMnVrbWY5Rzd4SWpKTVE
+Take this spreadsheet as an example <https://docs.google.com/spreadsheet/ccc?key=0AiB94r-ubs9sdHBQYTBOcEJ2TV9KeG5qT2lWSWhOOXc&usp=sharing>
 
-* Siempre *la columna A va a contener la clave del localizable, sin ningún tipo de guión bajo*. Simplemente el nombre con sus espacios y tal, muy legible.
-* Siempre *la primera fila que marque el comienzo del localizable en sí va a tener [key] en la columna A, y los códigos de país en las siguientes columnas*, marcando el idioma que vayáis a poner debajo. Es importante comentar que *en el caso de que un idioma sea el que queramos por defecto en Android deberemos marcarlo con un asterisco*, por ejemplo poniendo "es*" en vez de "es".
-* Para marcar un comentario habrá que poner *[COMMENT]* como clave. Es conveniente repetir en todos los idiomas el texto del comentario (incluso se puede traducir si se quiere).
-* Por defecto, todo lo que pongáis va a ser para todas las plataformas.
-* Para indicar que un texto es solo para Android, poned al principio de su key el tag __[a]__ en minúscula. 
-* Para indicar que un texto es solo para iOS, poned al principio de su key el tag __[i]__ en minúscula. 
-* El *final* del archivo localizable se marcará con el *tag [END] en la columna A*.
+* A column will **always** contain the locale key *in a readable way* (with spaces, no slashes, underscores, etc). The script will camel case keys on iOS and use underscores on android.
 
-Es importante que mantengáis un Google Docs con colorines muy claros, y podéis usar todos los modificadores de estilo que queráis (negrita, cursiva, etc), porque no afecta a la generación.
-Sobre todo si se lo pasáis a un cliente, hay que tenerlo todo muy aseado.
+* The **[key]** token on column A indicates start of localizables, so all the next columns to the right will have (in the same row than the [key] token) the language indicator. If you want to set one language as default, just append **\*** to the language.
 
-Es *recomendable que si esto lo va a tocar un cliente se bloqueen ciertas columnas y filas básicas*: La columna A entera y la fila que contenga [key] y los idiomas, para evitar _client disasters_.
+* The **[COMMENT]** token (always in the A column) indicates a comment, to use as separator in localizable files. It is recommended to translate also the comment for each column so that the generated file will be even more readable.
+
+* By default any translation you write will be generated for all platforms.
+	* If you want to restrict one key just for android prepend **[a]** to the key.
+	* To restrict just for iOS prepend **[i]** to the key.
+* The **[END]** token is required at the end of the column A to indicate that there are no more keys to generate.
+
+It is important to maintain the Spreadsheet file with colors (on important rows, columns, comments) so that it becomes more readable. You can use any style modifier you want as it won't affect the generation.
 
 - - -
 
-Espero que las aplicaciones os sean de utilidad. Para cualquier consulta: elikohen@gmail.com
+I hope this will help you in your projects. If you have any doubt just open an Issue and ask for it. 
