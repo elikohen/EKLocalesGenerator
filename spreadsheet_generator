@@ -126,11 +126,34 @@ def read_from_android(language, file, terms, create)
     puts "Element: #{p.attributes["name"] } value: #{p.text}"
     key = p.attributes["name"]
     value = p.text
-    term = ReadTerm.new(key)
-    term.add_value(language, value)
-    terms << term
+    # term = ReadTerm.new(key)
+    # term.add_value(language, value)
+    # terms << term
+    add_term(terms, language, key, value)
   end
 
+end
+
+# general
+
+def add_term(terms, language, key, value)
+  #searching for same key
+  term = ReadTerm.new(key)
+  found = false
+  terms.each do |theTerm|
+    if theTerm.keyword == term.keyword
+      term = theTerm
+      found = true
+      break
+    end
+  end
+
+  #if key not found create new one
+  if !found
+    terms << term
+  end
+  # adding value to term
+  term.add_value(language, value)
 end
 
 # Parsing and commandline checks
@@ -260,7 +283,7 @@ languages.keys.each do |lang|
       the_path = ios_path + "#{lang}.lproj/Localizable.strings"
       read_from_ios(lang, the_path, @terms, false)
     elsif has_android
-      the_path = android_path + "values-#{lang}/strings.xml"
+      the_path = android_path + "res/values-#{lang}/strings.xml"
       read_from_android(lang, the_path, @terms, false)
     end
   end

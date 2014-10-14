@@ -38,7 +38,9 @@ Those are the generator parameters, you can show all them by typing -h
 
 It might sound weird or difficult but I'll explain them
 
-- **Username and password** are the ones you use for gmail (maybe if you're using 2factor authentication it won't work...). Those values are required just for the first time, and get stored locally so that the next times the script reuses them.
+- **Username and password** are the ones you use for gmail. Those values are required just for the first time, and get stored locally so that the next times the script reuses them. Please read two notes below for common troubleshoting:
+	- You have 2FactorAuthentication on: Just go to <https://security.google.com/settings/security/apppasswords> and add a new one for this script, then use the generated one as the password parameter.
+	- You don't have 2FA but authentication fails: Google enables "Less secure apps" protection by default, just go to <https://www.google.com/settings/security/lesssecureapps> and disable it. If this doesn't fit your security requirements you should switch to 2FactorAuthentication on your account.
 - **Spreadsheet name** is part of the spreadsheet name without the [Localizables] token. For instance if the spreadsheet is called *[Localizables] Ztory* you can type just *Ztory* on this parameter.
 - **iOS, Android and JSON paths:** It must be at least one of this parameters. In case of iOS it should point to the folder where are the Localizables.strings, on android it should point to the .../res folder.
 - **check-unused** It shows a list of all keys that are not used on the project (it can provide false positives if you concatenate strings to access them).
