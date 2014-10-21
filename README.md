@@ -76,6 +76,30 @@ Take this spreadsheet as an example <https://docs.google.com/spreadsheet/ccc?key
 
 It is important to maintain the Spreadsheet file with colors (on important rows, columns, comments) so that it becomes more readable. You can use any style modifier you want as it won't affect the generation.
 
+
+
+Helper Script
+----------------------------------
+This is a helper script to place on your root project folder that downloads localizable script and executes it. Just change the line that starts with *./localizable-generator* with your own values.
+
+	#!/bin/bash
+	dir="$HOME/.ekscripts/locales-generator"
+	if [ -d "$dir" -a ! -h "$dir" ]
+	then
+   		echo "$dir found, updating script"
+	    git -C "$dir" fetch --all > /dev/null
+	else
+   		echo "Error: $dir not found, creating it and cloning script"
+   		mkdir -p "$dir"
+   		git clone "https://github.com/elikohen/EKLocalesGenerator.git" "$dir" > /dev/null
+	fi
+
+	projectDir=`pwd`
+	cd "$dir"
+	./localizable-generator -u your_user@gmail.com -p your_password -s Project_name -a "$projectDir/path_that_contains_res_folder/" $@
+	cd "$projectDir"
+
+
 - - -
 
 I hope this will help you in your projects. If you have any doubt just open an Issue and ask for it. 
