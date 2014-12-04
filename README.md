@@ -15,6 +15,8 @@ In order to use the scripts, all the required gems must be installed, so type th
 
 It will install all dependencies.
 
+If bundle command is not installed please follow this link: http://bundler.io/
+
 localizable-generator Usage
 ---------------------------
 
