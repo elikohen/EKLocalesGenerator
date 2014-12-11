@@ -163,6 +163,7 @@ options = Parser.new do |p|
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
+  p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
   p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
 end.process!
@@ -173,6 +174,7 @@ ios_path = options[:output_ios]
 android_path = options[:output_android]
 json_path = options[:output_json]
 spreadsheet = options[:spreadsheet]
+keep_keys = options[:keep_keys]
 check_unused = options[:check_unused]
 check_unused_mark = options[:check_unused_mark]
 
@@ -274,7 +276,7 @@ last_term_row = last_valid_row_index-1
 for row in first_term_row..last_term_row
   key = worksheet[row, 1]
   unless key.blank?
-    term = Term.new(key)
+    term = Term.new(key, keep_keys)
     languages.each do |lang, column_index|
       term_text = worksheet[row, column_index]
       term.values.store lang, term_text

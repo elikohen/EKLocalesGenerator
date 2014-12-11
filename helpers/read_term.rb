@@ -2,9 +2,9 @@ class ReadTerm
 
   # type represends system type (1 = Android, 2 = iPhone)
   #
-  def initialize(keyword)
+  def initialize(keyword, keep_key = false)
     @keyword = keyword
-    @keyword = keyword.words_separate unless is_comment?
+    @keyword = keyword.words_separate unless keep_key || is_comment?
     @values = Hash.new
   end
 

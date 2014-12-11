@@ -1,5 +1,6 @@
 class Term
-  def initialize(keyword)
+  def initialize(keyword, keep_key = false)
+    @keep_key = keep_key
     @keyword = keyword
     @values = Hash.new
   end
@@ -29,7 +30,11 @@ class Term
   end
 
   def keyword_iphone
+    if(@keep_key)
+      return @keyword
+    else
     '_'+@keyword.space_to_underscore.strip_tag.camel_case
+    end
   end
 
   def keyword_iphone_constant
@@ -37,11 +42,19 @@ class Term
   end
 
   def keyword_android
-    @keyword.space_to_underscore.strip_tag.downcase
+    if(@keep_key)
+      return @keyword
+    else
+      @keyword.space_to_underscore.strip_tag.downcase
+    end
   end
 
   def keyword_json
-    @keyword.space_to_underscore.strip_tag.downcase
+    if(@keep_key)
+      return @keyword
+    else
+      @keyword.space_to_underscore.strip_tag.downcase
+    end
   end
 
   def values_iphone

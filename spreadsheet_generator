@@ -54,7 +54,7 @@ end
 
 # Reading from iOS
 
-def read_from_ios(language, file, terms, create)
+def read_from_ios(language, file, terms, keep_keys)
   puts "Parsing filename : #{file}"
 
   f = nil
@@ -68,10 +68,11 @@ def read_from_ios(language, file, terms, create)
   current_comment = nil
   f.each_line do |line|
     if line.start_with?("//")
-      puts "Comment line #{line.gsub("//","")}"
-      term = ReadTerm.new("[COMMENT]")
-      term.add_value(language, line.gsub("//",""))
-      terms << term
+      # Disabled comments as there is no way of matching them
+      # puts "Comment line #{line.gsub("//","")}"
+      # term = ReadTerm.new("[COMMENT]")
+      # term.add_value(language, line.gsub("//",""))
+      # terms << term
     elsif line.start_with?("/*")
     elsif line.start_with?("\"")
       uglyKey = line.split("=", 2).first
@@ -79,7 +80,7 @@ def read_from_ios(language, file, terms, create)
       key = uglyKey[/\"(.*?)\"/m, 1]
       value = uglyValue[/\"(.*?)\"/m, 1]
       puts "Data line #{key},#{value}"
-      add_term(terms, language, key, value)
+      add_term(terms, language, key, value, keep_keys)
     end
   end
 end
@@ -92,7 +93,7 @@ def generate_android(language, target_directory)
   puts ' > '+language.yellow
 end
 
-def read_from_android(language, file, terms, create)
+def read_from_android(language, file, terms, keep_keys)
 
   puts "Parsing filename : #{file}"
 
@@ -109,16 +110,16 @@ def read_from_android(language, file, terms, create)
     puts "Element: #{p.attributes["name"] } value: #{p.text}"
     key = p.attributes["name"]
     value = p.text
-    add_term(terms, language, key, value)
+    add_term(terms, language, key, value, keep_keys)
   end
 
 end
 
 # general
 
-def add_term(terms, language, key, value)
+def add_term(terms, language, key, value, keep_keys = false)
   #searching for same key
-  term = ReadTerm.new(key)
+  term = ReadTerm.new(key, keep_keys)
   found = false
   terms.each do |theTerm|
     if theTerm.keyword == term.keyword
@@ -149,6 +150,7 @@ options = Parser.new do |p|
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
+  p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
 end.process!
 
 drive_user = options[:username]
@@ -157,6 +159,7 @@ ios_path = options[:output_ios]
 android_path = options[:output_android]
 json_path = options[:output_json]
 spreadsheet = options[:spreadsheet]
+keep_keys = options[:keep_keys]
 
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
@@ -249,10 +252,10 @@ puts 'Languages: ' + languages.keys.join(', ').yellow
 if default_language
   if has_ios
     the_path = ios_path + "#{default_language}.lproj/Localizable.strings"
-    read_from_ios(default_language, the_path, @terms, true)
+    read_from_ios(default_language, the_path, @terms, keep_keys)
   elsif has_android
     the_path = android_path + "res/values/strings.xml"
-    read_from_android(default_language, the_path, @terms, true)
+    read_from_android(default_language, the_path, @terms, keep_keys)
   end
 end
 
@@ -261,10 +264,10 @@ languages.keys.each do |lang|
   unless lang == default_language
     if has_ios
       the_path = ios_path + "#{lang}.lproj/Localizable.strings"
-      read_from_ios(lang, the_path, @terms, false)
+      read_from_ios(lang, the_path, @terms, keep_keys)
     elsif has_android
       the_path = android_path + "res/values-#{lang}/strings.xml"
-      read_from_android(lang, the_path, @terms, false)
+      read_from_android(lang, the_path, @terms, keep_keys)
     end
   end
 end 
