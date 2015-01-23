@@ -41,6 +41,10 @@ class Term
     'kLocale'+@keyword.space_to_underscore.strip_tag.camel_case
   end
 
+  def keyword_iphone_constant_swift
+    'sLocale'+@keyword.space_to_underscore.strip_tag.camel_case
+  end
+
   def keyword_android
     if(@keep_key)
       return @keyword
