@@ -1,0 +1,19 @@
+/*
+LocalizableConstants.h
+
+GENERATED - DO NOT MODIFY - use localizable-generator instead.
+
+Created by localizable-generator on <%= Time.now.localtime %>.
+Copyright (c) <%= Time.now.year %> Christian Rönningen. All rights reserved.
+*/
+
+<% @terms.each do |term| %>
+<%
+       if term.restriction == 'i' || term.restriction == nil
+         if term.is_comment?
+%>
+// ---
+<% else %>let <%= term.keyword_iphone_constant_swift %>		 = NSLocalizedString("<%= term.keyword_iphone %>",comment: "")<%
+   end
+   end
+   end %>

@@ -64,6 +64,11 @@ def generate_ios_constants(target_directory)
   puts ' > '+'LocalizableConstants.h'.yellow
 end
 
+def generate_ios_constants_swift(target_directory)
+  process_template 'ios_constant_localizable_swift.erb', target_directory,'LocalizableConstantSwift.swift'
+  puts ' > '+'LocalizableConstantSwift.swift'.yellow
+end
+
 # Generation for Android
 
 def generate_android(language, target_directory)
@@ -294,6 +299,7 @@ puts 'Loaded.'.cyan
 if has_ios
   puts 'Generating localizable files for ' + 'iOS'.red + '...'
   generate_ios_constants ios_path
+  generate_ios_constants_swift ios_path
   languages.keys.each do |lang|
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
