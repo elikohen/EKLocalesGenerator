@@ -9,8 +9,6 @@ require 'google_drive'
 require "google/api_client"
 require "google/api_client/client_secrets"
 require "google/api_client/auth/installed_app"
-require 'yaml'
-require 'json'
 
 require_relative 'helpers/string'
 require_relative 'helpers/term'
@@ -18,20 +16,6 @@ require_relative 'helpers/term'
 def copy_with_path(src, dst)
   FileUtils.mkdir_p(File.dirname(dst))
   FileUtils.cp(src, dst)
-end
-
-def store_credentials(credentials)
-  FileUtils.mkdir_p(Dir.home + '/.locgen/')
-  File.open(Dir.home + '/.locgen/users.yml', 'w+') { |f| f.write credentials.to_yaml }
-end
-
-def recover_credentials
-  our_filename = Dir.home + '/.locgen/users.yml'
-  if File.exist? our_filename
-    YAML::load(File.open(our_filename))
-  else
-    nil
-  end
 end
 
 def show_error(error_string)
