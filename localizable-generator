@@ -15,12 +15,6 @@ require 'json'
 require_relative 'helpers/string'
 require_relative 'helpers/term'
 
-# DEFAULT_USER = 'your.user@gmail.com'
-# DEFAULT_PASS = 'your_password'
-
-DEFAULT_CLIENT_ID = 'client_id'
-DEFAULT_CLIENT_SECRET = 'client_secret'
-
 def copy_with_path(src, dst)
   FileUtils.mkdir_p(File.dirname(dst))
   FileUtils.cp(src, dst)
@@ -70,6 +64,11 @@ end
 def generate_ios_constants(target_directory)
   process_template 'ios_constant_localizable.erb', target_directory, 'LocalizableConstants.h'
   puts ' > '+'LocalizableConstants.h'.yellow
+end
+
+def generate_ios_constants_swift(target_directory)
+  process_template 'ios_constant_localizable_swift.erb', target_directory,'LocalizableConstantSwift.swift'
+  puts ' > '+'LocalizableConstantSwift.swift'.yellow
 end
 
 # Generation for Android
@@ -164,12 +163,13 @@ show_error 'No parameters specified. Use the flag --help to see them all.' unles
 
 options = Parser.new do |p|
   p.banner = 'localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>'
-  p.version = '0.2'
+  p.version = '0.3'
   p.option :client, 'Client json path', :default => '', :short => 'u'
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
+  p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
   p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
 end.process!
@@ -181,6 +181,7 @@ json_path = options[:output_json]
 spreadsheet = options[:spreadsheet]
 check_unused = options[:check_unused]
 check_unused_mark = options[:check_unused_mark]
+keep_keys = options[:keep_keys]
 
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
@@ -287,10 +288,14 @@ last_term_row = last_valid_row_index-1
 for row in first_term_row..last_term_row
   key = worksheet[row, 1]
   unless key.blank?
-    term = Term.new(key)
+    term = Term.new(key,keep_keys)
     languages.each do |lang, column_index|
       term_text = worksheet[row, column_index]
       term.values.store lang, term_text
+
+      if(term_text.blank?)
+        puts "Warning: Missing ".red+"#{lang}".cyan+" for #{key}".red
+      end
     end
     @terms << term
   end
@@ -301,6 +306,7 @@ puts 'Loaded.'.cyan
 if has_ios
   puts 'Generating localizable files for ' + 'iOS'.red + '...'
   generate_ios_constants ios_path
+  generate_ios_constants_swift ios_path
   languages.keys.each do |lang|
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
