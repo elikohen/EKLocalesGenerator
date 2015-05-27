@@ -89,7 +89,8 @@ This is a helper script to place on your root project folder that downloads loca
 	if [ -d "$dir" -a ! -h "$dir" ]
 	then
    		echo "$dir found, updating script"
-	    git -C "$dir" fetch --all > /dev/null
+	       	cd "$dir"
+   		git pull > /dev/null
 	else
    		echo "Error: $dir not found, creating it and cloning script"
    		mkdir -p "$dir"
@@ -105,3 +106,4 @@ This is a helper script to place on your root project folder that downloads loca
 - - -
 
 I hope this will help you in your projects. If you have any doubt just open an Issue and ask for it. 
+
