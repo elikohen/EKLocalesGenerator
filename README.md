@@ -39,7 +39,7 @@ Those are the generator parameters, you can show all them by typing -h
 
 It might sound weird or difficult but I'll explain them
 
-- **Client, this is created going thru https://console.developers.google.com, follow the instructions to create a Client ID for native application, download the JSON and enter the download path here. After creating a project go to *APIs & auth* then *Credentials*, click on *Create new Client ID*, select *Installed Application* and then you can download the json.
+- **Client**, this is created going thru https://console.developers.google.com, follow the instructions to create a Client ID for native application, download the JSON and enter the download path here. After creating a project go to *APIs & auth* then *Credentials*, click on *Create new Client ID*, select *Installed Application* and then you can download the json.
 - **Spreadsheet name** is part of the spreadsheet name without the [Localizables] token. For instance if the spreadsheet is called *[Localizables] Ztory* you can type just *Ztory* on this parameter.
 - **iOS, Android and JSON paths:** It must be at least one of this parameters. In case of iOS it should point to the folder where are the Localizables.strings, on android it should point to the .../res folder.
 - **check-unused** It shows a list of all keys that are not used on the project (it can provide false positives if you concatenate strings to access them).
@@ -105,5 +105,7 @@ This is a helper script to place on your root project folder that downloads loca
 
 - - -
 
-I hope this will help you in your projects. If you have any doubt just open an Issue and ask for it. 
+I hope this will help you in your projects. If you have any doubt just open an Issue and ask for it.
 
+
+Note: Thanks to [Christian Ronningen](https://github.com/ChristianRonningen) for the support!
