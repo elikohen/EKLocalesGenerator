@@ -81,26 +81,26 @@ Helper Script
 ----------------------------------
 This is a helper script to place on your root project folder that downloads localizable script and executes it. Just change the line that starts with *./localizable-generator* with your own values.
 
-  #!/bin/bash
-  dir="$HOME/.ekscripts/locales-generator"
-  projectDir=`pwd`
-  if [ -d "$dir" -a ! -h "$dir" ]
-  then
-     echo "$dir found, updating script"
-     cd "$dir"
-     git pull > /dev/null
-     echo "Updated. NOTE: if some gems are missing go to $dir and type 'bundle update'"
-  else
-     echo "Error: $dir not found, creating it and cloning script"
-     mkdir -p "$dir"
-     git clone "https://github.com/elikohen/EKLocalesGenerator.git" "$dir" > /dev/null
-     cd "$dir"
-     bundle install
-  fi
-
-	cd "$dir"
-	./localizable-generator -u "$projectDir/client_secret_localizables.json" -s Project_name -a "$projectDir/path_that_contains_res_folder/" $@
-	cd "$projectDir"
+    #!/bin/bash
+    dir="$HOME/.ekscripts/locales-generator"
+    projectDir=`pwd`
+    if [ -d "$dir" -a ! -h "$dir" ]
+    then
+      echo "$dir found, updating script"
+      cd "$dir"
+      git pull > /dev/null
+      echo "Updated. NOTE: if some gems are missing go to $dir and type 'bundle update'"
+    else
+      echo "Error: $dir not found, creating it and cloning script"
+      mkdir -p "$dir"
+      git clone "https://github.com/elikohen/EKLocalesGenerator.git" "$dir" > /dev/null
+      cd "$dir"
+      bundle install
+    fi
+      
+    cd "$dir"
+    ./localizable-generator -u "$projectDir/client_secret_localizables.json" -s Project_name -a "$projectDir/path_that_contains_res_folder/" $@
+    cd "$projectDir"
 
 
 - - -
