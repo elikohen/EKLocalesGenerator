@@ -76,6 +76,11 @@ Take this spreadsheet as an example <https://docs.google.com/spreadsheet/ccc?key
 It is important to maintain the Spreadsheet file with colors (on important rows, columns, comments) so that it becomes more readable. You can use any style modifier you want as it won't affect the generation.
 
 
+Common issues
+----------------------------------
+Some of you are having a ssl issue related with OPENSSLv3 and rvm. This is related of ruby using a the wrong system certificates. If you fall into that please reinstall your current ruby version using the following command:
+
+`rvm reinstall [yourversion] --disable-binary`
 
 Helper Script
 ----------------------------------
