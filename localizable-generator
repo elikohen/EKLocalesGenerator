@@ -255,14 +255,20 @@ show_error 'Invalid format: [end] must not be before [key] in the A column' if f
 
 languages = Hash.new('languages')
 default_language = nil
+key_comments = -1
 
 for column in 2..worksheet.max_cols
   col_text = worksheet[first_valid_row_index, column]
-  default_language = col_text.downcase.gsub('*','') if col_text.include? '*'
-  languages.store col_text.downcase.gsub('*',''), column unless col_text.blank?
+  if col_text.downcase == '[comments]' 
+    key_comments = column
+  else
+    default_language = col_text.downcase.gsub('*','') if col_text.include? '*'
+    languages.store col_text.downcase.gsub('*',''), column unless col_text.blank?
+  end
 end
 
 puts 'Languages: ' + languages.keys.join(', ').yellow
+puts "Comments on column: #{key_comments}" unless key_comments == -1
 
 puts 'Building terminology in memory...'
 
@@ -273,7 +279,9 @@ last_term_row = last_valid_row_index-1
 for row in first_term_row..last_term_row
   key = worksheet[row, 1]
   unless key.blank?
-    term = Term.new(key,keep_keys)
+    key_comment = nil
+    key_comment = worksheet[row,key_comments] unless key_comments == -1
+    term = Term.new(key,key_comment,keep_keys)
     languages.each do |lang, column_index|
       term_text = worksheet[row, column_index]
       term.values.store lang, term_text
