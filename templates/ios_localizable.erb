@@ -8,14 +8,20 @@ Created by localizable-generator.
 Copyright (c) 2015 Eli Kohen. All rights reserved.
 */
 
-<% @terms.each do |term| %><%
+<%
+@terms.each do |term| 
 if term.restriction == 'i' || term.restriction == nil
   if term.is_comment?
-%>
+%>// <%= term.values[@current_lang] %>
 
-// <%= term.values[@current_lang] %>
-<% else %>
-"<%= term.keyword_iphone %>" = "<%= term.values_iphone[@current_lang] %>";<%
+<%  else 
+	  if term.has_comment?
+%>// <%= term.comment %>
+<%
+	  end 
+%>"<%= term.keyword_iphone %>" = "<%= term.values_iphone[@current_lang] %>";
+
+<%
     end
   end
 end %>

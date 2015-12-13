@@ -1,7 +1,8 @@
 class Term
-  def initialize(keyword, keep_key = false)
+  def initialize(keyword, comment = nil, keep_key = false)
     @keep_key = keep_key
     @keyword = keyword
+    @comment = comment
     @values = Hash.new
   end
 
@@ -15,6 +16,18 @@ class Term
 
   def keyword
     @keyword
+  end
+
+  def comment_iphone
+    @comment
+  end
+
+  def comment_android
+    @comment || ""
+  end
+
+  def has_comment?
+    @comment != nil && !@comment.empty?
   end
 
   def is_comment?
