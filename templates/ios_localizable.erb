@@ -16,7 +16,7 @@ if term.restriction == 'i' || term.restriction == nil
 
 <%  else 
 	  if term.has_comment?
-%>// <%= term.comment %>
+%>// <%= term.comment_iphone %>
 <%
 	  end 
 %>"<%= term.keyword_iphone %>" = "<%= term.values_iphone[@current_lang] %>";
