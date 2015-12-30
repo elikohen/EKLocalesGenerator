@@ -293,32 +293,6 @@ for row in first_term_row..last_term_row
   end
 end
 
-
-
-#Just to test!!!
-# languages = Hash.new('languages')
-# languages.store "es", 2
-# languages.store "en", 3
-# @terms = []
-# default_language = "en"
-# term = Term.new("Key with string", "Key with string", false)
-# term.store_value("es", "Hola %@")
-# term.store_value("en", "Hello %@")
-# @terms << term
-# term = Term.new("Key with int", "Key with int", false)
-# term.store_value("es", "%d items")
-# term.store_value("en", "%d items")
-# @terms << term
-# term = Term.new("Key with string int and float", "Key with string int and float", false)
-# term.store_value("es", "Hola %@ with %d and %f")
-# term.store_value("en", "Helo %f %@ and %d")
-# @terms << term
-# term = Term.new("String with no args", "ajan", false)
-# term.store_value("es", "Hola quetal")
-# term.store_value("en", "Hello whatsupp")
-# @terms << term
-#Just to test!!!
-
 puts 'Loaded.'.cyan
 
 if has_ios
