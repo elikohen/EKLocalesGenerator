@@ -20,7 +20,7 @@ struct LocalizedString {<%
 		return String(format: NSLocalizedString("<%= term.keyword_iphone %>", comment: ""), <%= term.specifiers_vars %>)
 	}
 <% 
-else
+		else
 %>
 	static var <%= term.keyword_iphone_constant_swift %>: String {
 		return NSLocalizedString("<%= term.keyword_iphone %>", comment: "<%= term.comment_iphone %>")
