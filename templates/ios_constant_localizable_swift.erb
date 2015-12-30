@@ -1,19 +1,32 @@
 /*
-LocalizableConstants.h
+LocalizableConstants.swift
 
 GENERATED - DO NOT MODIFY - use localizable-generator instead.
 
 Created by localizable-generator.
-Copyright (c) 2015 Christian Rönningen. All rights reserved.
+Copyright (c) 2015 EKGDev. All rights reserved.
 */
 
-<% @terms.each do |term| %>
-<%
-       if term.restriction == 'i' || term.restriction == nil
-         if term.is_comment?
+struct LocalizedString {<% 
+@terms.each do |term| 
+	if term.restriction == 'i' || term.restriction == nil
+    	if term.is_comment?
 %>
-// ---
-<% else %>let <%= term.keyword_iphone_constant_swift %>		 = NSLocalizedString("<%= term.keyword_iphone %>",comment: "")<%
-   end
-   end
-   end %>
+	// <%= term.values[@current_lang] %>
+<% 		
+		elsif term.has_specifiers?
+%>
+	static func <%= term.keyword_iphone_constant_swift %>(<%= term.specifiers_args %>) -> String {
+		return String(format: NSLocalizedString("<%= term.keyword_iphone %>", comment: ""), <%= term.specifiers_vars %>)
+	}
+<% 
+		else
+%>
+	static var <%= term.keyword_iphone_constant_swift %>: String {
+		return NSLocalizedString("<%= term.keyword_iphone %>", comment: "<%= term.comment_iphone %>")
+	}
+<%
+		end
+	end
+end 
+%>}

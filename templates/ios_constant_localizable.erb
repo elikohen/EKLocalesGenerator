@@ -5,18 +5,26 @@ EKGDev
 GENERATED - DO NOT MODIFY - use localizable-generator instead.
 
 Created by localizable-generator.
-Copyright (c) 2015 Eli Kohen. All rights reserved.
+Copyright (c) 2015 EKGDev. All rights reserved.
 */
 
-#define EKLocalizedString(key) NSLocalizedString(key,nil)
-
-<% @terms.each do |term| %>
-<%
-       if term.restriction == 'i' || term.restriction == nil
-         if term.is_comment?
+<% 
+@terms.each do |term| 
 %>
-// ---
-<% else %>#define		<%= term.keyword_iphone_constant %>		EKLocalizedString(@"<%= term.keyword_iphone %>")<%
-   end
-   end
-   end %>
+<%
+    if term.restriction == 'i' || term.restriction == nil
+    	if term.is_comment?
+%>
+// <%= term.values[@current_lang] %>
+<% 
+		elsif term.has_specifiers?
+%>
+#define <%= term.keyword_iphone_constant %>(<%= term.specifiers_vars %>) [NSString stringWithFormat:NSLocalizedString("<%= term.keyword_iphone %>", comment: "<%= term.comment_iphone %>"), <%= term.specifiers_vars %>]<%
+		else 
+%>
+#define <%= term.keyword_iphone_constant %> NSLocalizedString("<%= term.keyword_iphone %>", comment: "<%= term.comment_iphone %>")
+<%
+   		end
+   	end
+end 
+%>

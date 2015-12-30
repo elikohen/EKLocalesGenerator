@@ -284,8 +284,7 @@ for row in first_term_row..last_term_row
     term = Term.new(key,key_comment,keep_keys)
     languages.each do |lang, column_index|
       term_text = worksheet[row, column_index]
-      term.values.store lang, term_text
-
+      term.store_value(lang, term_text)
       if(term_text.blank?)
         puts "Warning: Missing ".red+"#{lang}".cyan+" for #{key}".red
       end
