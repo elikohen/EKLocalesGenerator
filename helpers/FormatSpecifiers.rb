@@ -6,7 +6,6 @@ class FormatSpecifiers
         matches = string.scan(/%(\d)?\$?(@|d|D|u|U|x|X|o|O|f|e|E|g|G|c|C|s|S|p|a|A|F|ld|lx|lu|zx)/)
         matches.sort! { |a,b| a[0] <=> b[0] }
         matches.each { |match|
-            puts "Found: #{match}"
             @specifiers.push(match[1])
         }
     end
