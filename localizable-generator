@@ -178,7 +178,7 @@ show_error 'You must provide a iOS, Android or JSON path at least to proceed' un
 # Get the spreadsheet from Google Drive
 puts 'Logging in to Google Drive...'
 
-CREDENTIALS_PATH = Dir.home + '/.locgen/users.json'
+CREDENTIALS_PATH = Dir.home + "/.locgen/#{spreadsheet}_key.json"
 
 def authorize(certificate)
   FileUtils.mkdir_p(File.dirname(CREDENTIALS_PATH))
