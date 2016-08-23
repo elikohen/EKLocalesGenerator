@@ -43,13 +43,13 @@ def generate_ios(language, target_directory)
   puts ' > '+language.yellow
 end
 
-def generate_ios_constants(target_directory)
-  process_template 'ios_constant_localizable.erb', target_directory, 'LocalizableConstants.h'
+def generate_ios_constants(target_directory, filename)
+  process_template 'ios_constant_localizable.erb', target_directory, filename'.h'
   puts ' > '+'LocalizableConstants.h'.yellow
 end
 
-def generate_ios_constants_swift(target_directory)
-  process_template 'ios_constant_localizable_swift.erb', target_directory,'LocalizableConstantSwift.swift'
+def generate_ios_constants_swift(target_directory, filename)
+  process_template 'ios_constant_localizable_swift.erb', target_directory, filename+'.swift'
   puts ' > '+'LocalizableConstantSwift.swift'.yellow
 end
 
@@ -150,8 +150,9 @@ options = Parser.new do |p|
   p.option :client_secret, 'google Client secret', :default => ''
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
+  p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
+  p.option :ios_just_swift, 'Whether to build constants just for swift', :default => true,
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
-  p.option :output_json, 'Path to the JSON localization directory', :default => '/the_path/strings/', :short => 'j'
   p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
   p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
@@ -160,8 +161,9 @@ end.process!
 client_id = options[:client_id]
 client_secret = options[:client_secret]
 ios_path = options[:output_ios]
+ios_constants_name = options[:ios_constants_name]
+ios_just_swift = options[:ios_just_swift]
 android_path = options[:output_android]
-json_path = options[:output_json]
 spreadsheet = options[:spreadsheet]
 check_unused = options[:check_unused]
 check_unused_mark = options[:check_unused_mark]
@@ -169,10 +171,9 @@ keep_keys = options[:keep_keys]
 
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
-has_json = json_path != '/the_path/strings/'
 
 show_error 'You must provide a Client id and secret' if client_id.blank? || client_secret.blank?
-show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || has_json
+show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios
 
 # Get the spreadsheet from Google Drive
 puts 'Logging in to Google Drive...'
@@ -269,8 +270,8 @@ puts 'Loaded.'.cyan
 
 if has_ios
   puts 'Generating localizable files for ' + 'iOS'.red + '...'
-  generate_ios_constants ios_path
-  generate_ios_constants_swift ios_path
+  generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
+  generate_ios_constants_swift(ios_path, ios_constants_name)
   languages.keys.each do |lang|
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
@@ -283,11 +284,6 @@ if has_android
     output_path = android_path + 'res/values/' if lang == default_language
     generate_android lang, output_path
   end
-end
-if has_json
-  puts 'Generating localizable files for ' + 'JSON'.yellow + '...'
-  output_path = json_path + 'strings/'
-  generate_json languages.keys, output_path
 end
 
 puts 'Done! - Locale generation went smoothly :)'.green
