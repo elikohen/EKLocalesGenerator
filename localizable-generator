@@ -44,12 +44,14 @@ def generate_ios(language, target_directory)
 end
 
 def generate_ios_constants(target_directory, filename)
-  process_template 'ios_constant_localizable.erb', target_directory, filename'.h'
+  @filename = filename
+  process_template 'ios_constant_localizable.erb', target_directory, "#{filename}.h"
   puts ' > '+'LocalizableConstants.h'.yellow
 end
 
 def generate_ios_constants_swift(target_directory, filename)
-  process_template 'ios_constant_localizable_swift.erb', target_directory, filename+'.swift'
+  @filename = filename
+  process_template 'ios_constant_localizable_swift.erb', target_directory, "#{filename}.swift"
   puts ' > '+'LocalizableConstantSwift.swift'.yellow
 end
 
@@ -151,7 +153,7 @@ options = Parser.new do |p|
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
-  p.option :ios_just_swift, 'Whether to build constants just for swift', :default => true,
+  p.option :ios_just_swift, 'Whether to build constants just for swift', :default => true
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'

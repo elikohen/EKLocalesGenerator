@@ -1,13 +1,13 @@
 /*
-LocalizableConstants.swift
+<%= @filename %>.swift
 
 GENERATED - DO NOT MODIFY - use localizable-generator instead.
 
 Created by localizable-generator.
-Copyright (c) 2015 EKGDev. All rights reserved.
+Copyright (c) 2016 EKGDev. All rights reserved.
 */
 
-struct LocalizedString {<% 
+struct <%= @filename %> {<% 
 @terms.each do |term| 
 	if term.restriction == 'i' || term.restriction == nil
     	if term.is_comment?
