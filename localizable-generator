@@ -5,11 +5,8 @@ require 'rubygems'
 require 'erb'
 require 'fileutils'
 require 'micro-optparse'
-gem 'google_drive', '>=1.0.0'
+gem 'google_drive', '>=2.0.0'
 require 'google_drive'
-require "google/api_client"
-require "google/api_client/client_secrets"
-require "google/api_client/auth/installed_app"
 
 require_relative 'helpers/string'
 require_relative 'helpers/term'
@@ -149,7 +146,8 @@ show_error 'No parameters specified. Use the flag --help to see them all.' unles
 options = Parser.new do |p|
   p.banner = 'localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>'
   p.version = '0.3'
-  p.option :client, 'Client json path', :default => '', :short => 'u'
+  p.option :client_id, 'google Client id', :default => ''
+  p.option :client_secret, 'google Client secret', :default => ''
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
@@ -159,7 +157,8 @@ options = Parser.new do |p|
   p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
 end.process!
 
-client_json_path = options[:client]
+client_id = options[:client_id]
+client_secret = options[:client_secret]
 ios_path = options[:output_ios]
 android_path = options[:output_android]
 json_path = options[:output_json]
@@ -172,47 +171,20 @@ has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
 has_json = json_path != '/the_path/strings/'
 
-show_error 'You must provide a Client json path' if client_json_path.blank?
+show_error 'You must provide a Client id and secret' if client_id.blank? || client_secret.blank?
 show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || has_json
 
 # Get the spreadsheet from Google Drive
 puts 'Logging in to Google Drive...'
 
 CREDENTIALS_PATH = Dir.home + "/.locgen/#{spreadsheet}_key.json"
+FileUtils.mkdir_p(File.dirname(CREDENTIALS_PATH))
 
-def authorize(certificate)
-  FileUtils.mkdir_p(File.dirname(CREDENTIALS_PATH))
-  file_store = Google::APIClient::FileStore.new(CREDENTIALS_PATH)
-  storage = Google::APIClient::Storage.new(file_store)
-
-  auth = storage.authorize
-
-  if auth.nil? || (auth.expired? && auth.refresh_token.nil?)
-    client_secrets = Google::APIClient::ClientSecrets.load(certificate)
-    flow = Google::APIClient::InstalledAppFlow.new(
-      :client_id => client_secrets.client_id,
-      :client_secret => client_secrets.client_secret,
-      :scope => ['https://www.googleapis.com/auth/drive','https://spreadsheets.google.com/feeds/']
-    )
-    auth = flow.authorize(storage)
-    puts "Credentials saved to #{CREDENTIALS_PATH}" unless auth.nil?
-  end
-  auth
-end
-
-client = Google::APIClient.new(
-    :application_name => "Ztory Localizables",
-    :application_version => "1.0"
-  )
-client.authorization = authorize(client_json_path)
-
-access_token = client.authorization.access_token
-
-begin
-  # session = GoogleDrive.login(drive_user, drive_pass)
-  session = GoogleDrive.login_with_oauth(access_token)
+begin 
+  session = GoogleDrive.saved_session(CREDENTIALS_PATH, nil, client_id, client_secret)
 rescue
   show_error 'Couldn\'t access Google Drive. Check your credentials!'
+  exit -1
 end
 
 # Recover our spreadsheets

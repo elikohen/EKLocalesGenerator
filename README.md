@@ -23,7 +23,8 @@ localizable-generator Usage
 Those are the generator parameters, you can show all them by typing -h
 
     localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>
-    -u client                        Client json path, created at https://console.developers.google.com/
+        --client-id                  google Client id
+    -l, --client-secret              google Client secret
     -s example-spreadsheet,          Spreadsheet containing the localization info
         --spreadsheet
     -i /the_path/Localizables/,      Path to the iOS localization directory
@@ -32,6 +33,7 @@ Those are the generator parameters, you can show all them by typing -h
         --output-android
     -j /the_path/strings/,           Path to the JSON localization directory
         --output-json
+    -k, --[no-]keep-keys             Whether to maintain original keys or not
     -c, --[no-]check-unused          Whether to check unused keys on project
     -m, --[no-]check-unused-mark     If checking keys -> mark them on spreadsheet prepending [u]
     -h, --help                       Show this message
@@ -39,7 +41,7 @@ Those are the generator parameters, you can show all them by typing -h
 
 It might sound weird or difficult but I'll explain them
 
-- **Client**, this is created going thru https://console.developers.google.com, follow the instructions to create a Client ID for native application, download the JSON and enter the download path here. After creating a project go to *APIs & auth* then *Credentials*, click on *Create new Client ID*, select *Installed Application* and then you can download the json.
+- **Client**, this is created going thru https://console.developers.google.com, follow the instructions to create a Client ID for native application, download the JSON and enter the download path here. After creating a project go to *APIs & auth* then *Credentials*, click on *Create new Client ID*, select *Installed Application* and then you can download the json. There you can find the client_id and secret required by the script
 - **Spreadsheet name** is part of the spreadsheet name without the [Localizables] token. For instance if the spreadsheet is called *[Localizables] Ztory* you can type just *Ztory* on this parameter.
 - **iOS, Android and JSON paths:** It must be at least one of this parameters. In case of iOS it should point to the folder where are the Localizables.strings, on android it should point to the .../res folder.
 - **check-unused** It shows a list of all keys that are not used on the project (it can provide false positives if you concatenate strings to access them).
