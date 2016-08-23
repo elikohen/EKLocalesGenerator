@@ -203,8 +203,10 @@ default_language = nil
 
 for column in 2..worksheet.max_cols
   col_text = worksheet[first_valid_row_index, column]
-  default_language = col_text.downcase.gsub('*','') if col_text.include? '*'
-  languages.store col_text.downcase.gsub('*',''), column unless col_text.blank?
+  if col_text.downcase != '[comments]' 
+    default_language = col_text.downcase.gsub('*','') if col_text.include? '*'
+    languages.store col_text.downcase.gsub('*',''), column unless col_text.blank?
+  end
 end
 
 puts 'Languages: ' + languages.keys.join(', ').yellow
