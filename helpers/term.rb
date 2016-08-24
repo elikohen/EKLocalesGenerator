@@ -66,7 +66,7 @@ class Term
 
   def keyword_iphone
     if(@keep_key)
-      return @keyword
+      return @keyword.strip_tag
     else
     '_'+@keyword.space_to_underscore.strip_tag.camel_case
     end
@@ -82,15 +82,7 @@ class Term
 
   def keyword_android
     if(@keep_key)
-      return @keyword
-    else
-      @keyword.space_to_underscore.strip_tag.downcase
-    end
-  end
-
-  def keyword_json
-    if(@keep_key)
-      return @keyword
+      return @keyword.strip_tag
     else
       @keyword.space_to_underscore.strip_tag.downcase
     end
