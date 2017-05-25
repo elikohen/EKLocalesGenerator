@@ -154,6 +154,7 @@ options = Parser.new do |p|
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
   p.option :ios_just_swift, 'Whether to build constants just for swift', :default => true
+  p.option :ios_add_base, 'Whether to add Base.lproj linked with the default language', :default => true
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
   p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
@@ -165,6 +166,7 @@ client_secret = options[:client_secret]
 ios_path = options[:output_ios]
 ios_constants_name = options[:ios_constants_name]
 ios_just_swift = options[:ios_just_swift]
+ios_add_base = options[:ios_add_base]
 android_path = options[:output_android]
 spreadsheet = options[:spreadsheet]
 check_unused = options[:check_unused]
@@ -275,6 +277,7 @@ if has_ios
   generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
   generate_ios_constants_swift(ios_path, ios_constants_name)
   languages.keys.each do |lang|
+    generate_ios "Base", ios_path + "Base.lproj/" if ios_add_base && lang == default_language
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
   end
