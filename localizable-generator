@@ -277,7 +277,7 @@ if has_ios
   generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
   generate_ios_constants_swift(ios_path, ios_constants_name)
   languages.keys.each do |lang|
-    generate_ios "Base", ios_path + "Base.lproj/" if ios_add_base && lang == default_language
+    generate_ios lang, ios_path + "Base.lproj/" if ios_add_base && lang == default_language
     output_path = ios_path + "#{lang}.lproj/"
     generate_ios lang, output_path
   end
