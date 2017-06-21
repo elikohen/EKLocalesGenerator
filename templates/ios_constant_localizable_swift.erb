@@ -10,10 +10,12 @@ Copyright (c) 2016 EKGDev. All rights reserved.
 import Foundation
 
 struct <%= @filename %> {<% 
+
 @terms.each do |term| 
 	if term.restriction == 'i' || term.restriction == nil
     	if term.is_comment?
 %>
+
 	// MARK: - <%= term.values[@current_lang] %>
 <% 		
 		elsif term.has_specifiers?
