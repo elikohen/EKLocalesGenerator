@@ -274,6 +274,7 @@ puts 'Loaded.'.cyan
 
 if has_ios
   puts 'Generating localizable files for ' + 'iOS'.red + '...'
+  @current_lang = default_language
   generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
   generate_ios_constants_swift(ios_path, ios_constants_name)
   languages.keys.each do |lang|

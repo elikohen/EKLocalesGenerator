@@ -14,7 +14,7 @@ struct <%= @filename %> {<%
 	if term.restriction == 'i' || term.restriction == nil
     	if term.is_comment?
 %>
-	// <%= term.values[@current_lang] %>
+	// MARK: - <%= term.values[@current_lang] %>
 <% 		
 		elsif term.has_specifiers?
 %>
