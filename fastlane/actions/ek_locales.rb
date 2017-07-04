@@ -9,7 +9,15 @@ module Fastlane
         require 'fileutils'
 
         clientId = params[:google_client_id]
+        if clientId.nil?
+          # Using EKGDevelopment client id
+          clientId = "796654975708-spbvd0qbs4rm6l3qdn3j9dsghoec5ini.apps.googleusercontent.com"
+        end
         clientSecret = params[:google_client_secret]
+        if clientSecret.nil? {
+          # Using EKGDevelopment client secret
+          clientSecret = "Vp9XfGl6WnYNCTAHIf2ltpCd"
+        } 
         localizablesDir = params[:localizables_dir]
         spreadsheetName = params[:spreadsheet_name]
         pathToRepo = params[:repository_path]
@@ -58,14 +66,6 @@ module Fastlane
       end
 
       def self.available_options
-        [FastlaneCore::ConfigItem.new(key: :google_client_id,
-                                       env_name: "EK_LOCALES_GOOGLE_CLIENT_ID",
-                                       description: "Google apps client id",
-                                       optional: false),
-        FastlaneCore::ConfigItem.new(key: :google_client_secret,
-                                       env_name: "EK_LOCALES_GOOGLE_CLIENT_SECRET",
-                                       description: "Google apps client secret",
-                                       optional: false),
         FastlaneCore::ConfigItem.new(key: :spreadsheet_name,
                                        env_name: "EK_LOCALES_GOOGLE_SPREADSHEET_NAME",
                                        description: "Name of spreadsheet. I.E. if spreadsheet is '[Localizables] myProject', you must set 'myProject'",
@@ -74,6 +74,14 @@ module Fastlane
                                        env_name: "EK_LOCALES_GOOGLE_LOCALIZABLES_DIR",
                                        description: "Directory of .lproj files on iOS and res directory on android",
                                        optional: false),
+        [FastlaneCore::ConfigItem.new(key: :google_client_id,
+                                       env_name: "EK_LOCALES_GOOGLE_CLIENT_ID",
+                                       description: "Custom google apps client id",
+                                       optional: true),
+        FastlaneCore::ConfigItem.new(key: :google_client_secret,
+                                       env_name: "EK_LOCALES_GOOGLE_CLIENT_SECRET",
+                                       description: "Custom google apps client secret",
+                                       optional: true),
         FastlaneCore::ConfigItem.new(key: :repository_path,
                                        env_name: "EK_LOCALES_REPO_PATH",
                                        description: "Path to the repository",
@@ -88,8 +96,6 @@ module Fastlane
       def self.example_code
         [
           "ek_locales(
-            google_client_id: 'someid-somehash.apps.googleusercontent.com',
-            google_client_secret: 'someHexa64Secret',
             spreadsheet_name: 'myProject',
             localizables_dir: 'myProject/i18n/'
           )",
