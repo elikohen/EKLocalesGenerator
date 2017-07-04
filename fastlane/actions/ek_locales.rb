@@ -66,7 +66,7 @@ module Fastlane
       end
 
       def self.available_options
-        FastlaneCore::ConfigItem.new(key: :spreadsheet_name,
+        [FastlaneCore::ConfigItem.new(key: :spreadsheet_name,
                                        env_name: "EK_LOCALES_GOOGLE_SPREADSHEET_NAME",
                                        description: "Name of spreadsheet. I.E. if spreadsheet is '[Localizables] myProject', you must set 'myProject'",
                                        optional: false),
@@ -74,7 +74,7 @@ module Fastlane
                                        env_name: "EK_LOCALES_GOOGLE_LOCALIZABLES_DIR",
                                        description: "Directory of .lproj files on iOS and res directory on android",
                                        optional: false),
-        [FastlaneCore::ConfigItem.new(key: :google_client_id,
+        FastlaneCore::ConfigItem.new(key: :google_client_id,
                                        env_name: "EK_LOCALES_GOOGLE_CLIENT_ID",
                                        description: "Custom google apps client id",
                                        optional: true),
