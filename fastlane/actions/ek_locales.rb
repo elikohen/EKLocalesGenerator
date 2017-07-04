@@ -11,12 +11,12 @@ module Fastlane
         clientId = params[:google_client_id]
         if clientId.nil?
           # Using EKGDevelopment client id
-          clientId = "796654975708-spbvd0qbs4rm6l3qdn3j9dsghoec5ini.apps.googleusercontent.com"
+          clientId = "1063903384675-02js9jrt297u136fa6pq591i2ul9s86p.apps.googleusercontent.com"
         end
         clientSecret = params[:google_client_secret]
         if clientSecret.nil? {
           # Using EKGDevelopment client secret
-          clientSecret = "Vp9XfGl6WnYNCTAHIf2ltpCd"
+          clientSecret = "VL5mQuwxMainnS3uiNEMCkNF"
         } 
         localizablesDir = params[:localizables_dir]
         spreadsheetName = params[:spreadsheet_name]
