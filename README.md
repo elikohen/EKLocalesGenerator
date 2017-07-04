@@ -3,7 +3,7 @@ Localization Utils
 Utility set to help on language localisation of Android and iOS apps.
 
 * **localizable-generator:** Will generate strings.xml files for Android and all Localizable.strings for iOS from a Google Drive Spreadsheet data.
-* **spreadsheet-generator:** Will populate a Google Drive Spreadsheet reading from Android strings.xml or iOS Localizable.strings files.
+* **spreadsheet-generator:** [Only on standalone] Will populate a Google Drive Spreadsheet reading from Android strings.xml or iOS Localizable.strings files.
 
 
 Fastlane usage
@@ -22,19 +22,17 @@ import_from_git(url: 'git@github.com:elikohen/EKLocalesGenerator.git', path: 'fa
 
 So now you're ready to use the ek_locales action. It contains the following parameters:
 
-- *google_client_id*:  Google apps client 
-- *google_client_secret*: Google apps client secret
 - *spreadsheet_name*: Name of spreadsheet. I.E. if spreadsheet is '[Localizables] myProject', you mustf set 'myProject'                           
 - *localizables_dir*: Directory of .lproj files on iOS and res directory on android                      
+- *google\_client\_id*: [Optional] If you want to use your own google apps account with google drive this is the Google apps client id 
+- *google\_client\_secret*: [Optional] If you want to use your own google apps account with google drive this is the Google apps client secret of the oauth key
 - *repository_path*: [optional] Path to the repository if it's located on a subfolder. Usefull if you're using c.i. and it checkouts a specific branch to a temporary folder-
-- *mark_unused*: Mark all the unused strings in spreadsheet
+- *mark_unused*: [Optional] Mark all the unused strings in spreadsheet
 
 examples:
 
 ```
 ek_locales(
-	google_client_id: 'someid-somehash.apps.googleusercontent.com',
-	google_client_secret: 'someHexa64Secret',
 	spreadsheet_name: 'myProject',
 	localizables_dir: 'myProject/i18n/'
 )
