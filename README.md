@@ -5,8 +5,55 @@ Utility set to help on language localisation of Android and iOS apps.
 * **localizable-generator:** Will generate strings.xml files for Android and all Localizable.strings for iOS from a Google Drive Spreadsheet data.
 * **spreadsheet-generator:** Will populate a Google Drive Spreadsheet reading from Android strings.xml or iOS Localizable.strings files.
 
-Installation
-------------
+
+Fastlane usage
+--------------
+There's a built in integration to fastlane inside the repo. I assume you're already working with it, otherwise I encourage to to take a look at their [Fastlane Documentation](https://docs.fastlane.tools/)
+
+Once you have fastlane setup, you just need to import our fastlane file (so that the action ek_locales action is imported)
+
+Add the following import just after `fastlane version x.x.x` on your fastfile:
+
+```
+fastlane_version "2.32.1"
+
+import_from_git(url: 'git@github.com:elikohen/EKLocalesGenerator.git', path: 'fastlane/Fastfile')
+```
+
+So now you're ready to use the ek_locales action. It contains the following parameters:
+
+- *google_client_id*:  Google apps client 
+- *google_client_secret*: Google apps client secret
+- *spreadsheet_name*: Name of spreadsheet. I.E. if spreadsheet is '[Localizables] myProject', you mustf set 'myProject'                           
+- *localizables_dir*: Directory of .lproj files on iOS and res directory on android                      
+- *repository_path*: [optional] Path to the repository if it's located on a subfolder. Usefull if you're using c.i. and it checkouts a specific branch to a temporary folder-
+- *mark_unused*: Mark all the unused strings in spreadsheet
+
+examples:
+
+```
+ek_locales(
+	google_client_id: 'someid-somehash.apps.googleusercontent.com',
+	google_client_secret: 'someHexa64Secret',
+	spreadsheet_name: 'myProject',
+	localizables_dir: 'myProject/i18n/'
+)
+```
+```
+ek_locales(
+	google_client_id: 'someid-somehash.apps.googleusercontent.com',
+	google_client_secret: 'someHexa64Secret'',
+	spreadsheet_name: 'myProject',
+	localizables_dir: 'myProject/i18n/',
+	repository_path: 'some/temporal/subdir/',
+	mark_unused: true
+)
+```
+
+
+
+Standalone Installation
+-----------------------
 Ruby >= 1.9.3 is required. If you require installing it and don't know how to do it, try with [RVM](https://rvm.io/rvm/install/).
 
 In order to use the scripts, all the required gems must be installed, so type this on the root folder:
