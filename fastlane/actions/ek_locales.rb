@@ -21,6 +21,8 @@ module Fastlane
         localizablesDir = params[:localizables_dir]
         spreadsheetName = params[:spreadsheet_name]
         pathToRepo = params[:repository_path]
+        ios_extension = params[:ios_extension] ||= false
+        ios_suffix = params[:ios_suffix] ||= ''
         markUnused = params[:mark_unused]
 
         setup = Setup.new
@@ -30,7 +32,13 @@ module Fastlane
           platformParameter = "-a"
         elsif setup.is_ios?
           platformParameter = "-i"
-          extraParams = "-n LocalizedString -k"
+          params = Array.new
+          params.push("-n LocalizedString")
+          params.push("--ios-constants-extension") unless !ios_extension
+          params.push("--ios-constants-sufix #{ios_suffix}") unless ios_suffix.empty?
+          params.push("-k") #Keep keys
+
+          extraParams = params.join(" ")
         else
           UI.user_error!('Please run EkLocales Action from an ios or android project')
         end
@@ -86,6 +94,15 @@ module Fastlane
                                        env_name: "EK_LOCALES_REPO_PATH",
                                        description: "Path to the repository",
                                        optional: true), 
+        FastlaneCore::ConfigItem.new(key: :ios_extension,
+                                       env_name: "EK_LOCALES_IOS_EXTENSION",
+                                       description: "Whether to extend String or use LocalizedString struct",
+                                       optional: true,
+                                       is_string: false),
+        FastlaneCore::ConfigItem.new(key: :ios_suffix,
+                                       env_name: "EK_LOCALES_IOS_SUFFIX",
+                                       description: "Suffix to use on generated variables",
+                                       optional: true),
         FastlaneCore::ConfigItem.new(key: :mark_unused,
                                        env_name: "EK_LOCALES_MARK_UNUSED",
                                        description: "Mark all the unused strings in Localizables",
@@ -105,6 +122,8 @@ module Fastlane
             spreadsheet_name: 'myProject',
             localizables_dir: 'myProject/i18n/',
             repository_path: 'some/temporal/subdir/',
+            ios_extension: true,
+            ios_suffix: 'Localized',
             mark_unused: true
           )",
         ]

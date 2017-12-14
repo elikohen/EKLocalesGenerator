@@ -9,7 +9,10 @@ Copyright (c) 2016 EKGDev. All rights reserved.
 
 import Foundation
 
-struct <%= @filename %> {
+<% if @isExtension 
+%>extension String { <% else 
+%>struct <%= @filename %> { <%
+end %>
 <% 
 @terms.each do |term| 
 	if term.restriction == 'i' || term.restriction == nil
@@ -20,13 +23,13 @@ struct <%= @filename %> {
 <% 		
 		elsif term.has_specifiers?
 %>
-	static func <%= term.keyword_iphone_constant_swift %>(<%= term.specifiers_args %>) -> String {
+	static func <%= term.keyword_iphone_constant_swift %><%= @sufix %>(<%= term.specifiers_args %>) -> String {
 		return String(format: NSLocalizedString("<%= term.keyword_iphone %>", comment: ""), <%= term.specifiers_vars %>)
 	}
 <% 
 		else
 %>
-	static var <%= term.keyword_iphone_constant_swift %>: String {
+	static var <%= term.keyword_iphone_constant_swift %><%= @sufix %>: String {
 		return NSLocalizedString("<%= term.keyword_iphone %>", comment: "<%= term.comment_iphone %>")
 	}
 <%

@@ -49,8 +49,10 @@ def generate_ios_constants(target_directory, filename)
   puts ' > '+'LocalizableConstants.h'.yellow
 end
 
-def generate_ios_constants_swift(target_directory, filename)
+def generate_ios_constants_swift(target_directory, filename, extension, sufix)
   @filename = filename
+  @isExtension = extension
+  @sufix = sufix
   process_template 'ios_constant_localizable_swift.erb', target_directory, "#{filename}.swift"
   puts ' > '+'LocalizableConstantSwift.swift'.yellow
 end
@@ -153,6 +155,8 @@ options = Parser.new do |p|
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
+  p.option :ios_constants_extension, 'Whether to extend String or use LocalizedString struct', :default => false
+  p.option :ios_constants_sufix, 'sufix to use on elements', :default => ''
   p.option :ios_just_swift, 'Whether to build constants just for swift', :default => true
   p.option :ios_add_base, 'Whether to add Base.lproj linked with the default language', :default => true
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
@@ -165,6 +169,8 @@ client_id = options[:client_id]
 client_secret = options[:client_secret]
 ios_path = options[:output_ios]
 ios_constants_name = options[:ios_constants_name]
+ios_constants_extension = options[:ios_constants_extension]
+ios_constants_sufix = options[:ios_constants_sufix]
 ios_just_swift = options[:ios_just_swift]
 ios_add_base = options[:ios_add_base]
 android_path = options[:output_android]
@@ -276,7 +282,7 @@ if has_ios
   puts 'Generating localizable files for ' + 'iOS'.red + '...'
   @current_lang = default_language
   generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
-  generate_ios_constants_swift(ios_path, ios_constants_name)
+  generate_ios_constants_swift(ios_path, ios_constants_name, ios_constants_extension, ios_constants_sufix)
   languages.keys.each do |lang|
     generate_ios lang, ios_path + "Base.lproj/" if ios_add_base && lang == default_language
     output_path = ios_path + "#{lang}.lproj/"
