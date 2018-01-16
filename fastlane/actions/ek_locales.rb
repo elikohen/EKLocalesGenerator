@@ -25,12 +25,11 @@ module Fastlane
         ios_suffix = params[:ios_suffix] ||= ''
         markUnused = params[:mark_unused]
 
-        setup = Setup.new
         platformParameter = ""
         extraParams = ""
-        if setup.is_android?
+        if ENV["FASTLANE_PLATFORM_NAME"] == "android"
           platformParameter = "-a"
-        elsif setup.is_ios?
+        elsif ENV["FASTLANE_PLATFORM_NAME"] == "ios"
           platformParameter = "-i"
           params = Array.new
           params.push("-n LocalizedString")
