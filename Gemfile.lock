@@ -5,7 +5,7 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     declarative (0.0.10)
     declarative-option (0.1.0)
-    faraday (0.13.1)
+    faraday (0.14.0)
       multipart-post (>= 1.2, < 3)
     google-api-client (0.13.6)
       addressable (~> 2.5, >= 2.5.1)
@@ -14,7 +14,7 @@ GEM
       mime-types (~> 3.0)
       representable (~> 3.0)
       retriable (>= 2.0, < 4.0)
-    google_drive (2.1.7)
+    google_drive (2.1.8)
       google-api-client (>= 0.11.0, < 0.14.0)
       googleauth (>= 0.5.0, < 1.0.0)
       nokogiri (>= 1.5.3, < 2.0.0)
@@ -38,9 +38,9 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mini_portile2 (2.3.0)
-    multi_json (1.12.2)
+    multi_json (1.13.1)
     multipart-post (2.0.0)
-    nokogiri (1.8.1)
+    nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     os (0.9.6)
     public_suffix (3.0.1)
@@ -60,8 +60,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  google_drive
+  google_drive (= 2.1.8)
   micro-optparse
+  nokogiri (= 1.8.2)
 
 BUNDLED WITH
    1.16.0
