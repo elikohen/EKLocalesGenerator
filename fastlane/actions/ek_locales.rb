@@ -57,9 +57,8 @@ module Fastlane
         #Checking stored credentials (if not present it requires the script to be run standalone)
         credsFile = Dir.home + "/.locgen/#{spreadsheetName}_key.json"
         if !File.file?(credsFile)
-          UI.message "Google credentials file not present. You must copy and execute following scrip call\n"
-          UI.message "#{scriptDir}localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret} -s #{spreadsheetName} -j".blue
-          UI.message "\nIndependently and then call this fastlane action again"
+          UI.user_error!("Google credentials file not present. You must copy and execute following script call independently and then call this fastlane action again\n\n\n" + 
+          "#{scriptDir}localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret} -s #{spreadsheetName} -j\n\n\n".blue)
         else
           command = "./localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret}"
           command << " -s #{spreadsheetName} #{platformParameter} #{projectDir}#{localizablesDir} #{extraParams}"
