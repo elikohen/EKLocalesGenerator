@@ -153,6 +153,7 @@ options = Parser.new do |p|
   p.option :client_id, 'google Client id', :default => ''
   p.option :client_secret, 'google Client secret', :default => ''
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
+  p.option :spreadsheet_id, 'Spreadsheet id shown in the path of the url (just before /edit)', :default => ''
   p.option :just_credentials, 'If enabled, script just creates google credentials', :default => false
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
@@ -170,6 +171,7 @@ end.process!
 client_id = options[:client_id]
 client_secret = options[:client_secret]
 spreadsheet = options[:spreadsheet]
+spreadsheet_id = options[:spreadsheet_id]
 just_credentials = options[:just_credentials]
 ios_path = options[:output_ios]
 ios_constants_name = options[:ios_constants_name]
@@ -211,20 +213,27 @@ puts 'Logged.'.cyan
 puts "Searching for #{spreadsheet}..."
 matching_spreadsheets = []
 
-session.spreadsheets(q: "name contains '[Localizables]'").each do |s|
-  matching_spreadsheets << s if s.title.downcase.include?(spreadsheet.downcase)
+if !spreadsheet_id.empty? 
+  found_spreadsheet = session.spreadsheet_by_key(spreadsheet_id)
+  show_error 'Invalid spreadsheet id' if !found_spreadsheet
+else
+  session.spreadsheets(q: "name contains '[Localizables]'").each do |s|
+    matching_spreadsheets << s if s.title.downcase.include?(spreadsheet.downcase)
+  end
+
+  if matching_spreadsheets.count > 1
+    puts 'Found:'.cyan
+    matching_spreadsheets.each { |ms| puts ms.title.red }
+    show_error 'More than one match found. You have to be more specific!'
+  elsif matching_spreadsheets.count == 0
+    show_error "Unable to find any spreadsheet matching your criteria: #{spreadsheet}"
+  end
+
+  found_spreadsheet = matching_spreadsheets[0]
 end
 
-if matching_spreadsheets.count > 1
-  puts 'Found:'.cyan
-  matching_spreadsheets.each { |ms| puts ms.title.red }
-  show_error 'More than one match found. You have to be more specific!'
-elsif matching_spreadsheets.count == 0
-  show_error "Unable to find any spreadsheet matching your criteria: #{spreadsheet}"
-end
-
-found_spreadsheet = matching_spreadsheets[0]
-
+found_spreadsheet = session.spreadsheet_by_key("1xNJxI16EjE6RzRnoht8RtDBzplq7c7cxxgmZl4qMY1I")
+exit 1 if !found_spreadsheet
 puts "Found one match: #{found_spreadsheet.title}".cyan
 
 # Processing the spreadsheet

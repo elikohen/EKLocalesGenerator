@@ -20,6 +20,7 @@ module Fastlane
         end
         localizablesDir = params[:localizables_dir]
         spreadsheetName = params[:spreadsheet_name]
+        spreadsheetId = params[:spreadsheet_id]
         pathToRepo = params[:repository_path]
         ios_extension = params[:ios_extension] ||= false
         ios_suffix = params[:ios_suffix] ||= ''
@@ -60,8 +61,11 @@ module Fastlane
           UI.user_error!("Google credentials file not present. You must copy and execute following script call independently and then call this fastlane action again\n\n\n" + 
           "#{scriptDir}localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret} -s #{spreadsheetName} -j\n\n\n".blue)
         else
-          command = "./localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret}"
-          command << " -s #{spreadsheetName} #{platformParameter} #{projectDir}#{localizablesDir} #{extraParams}"
+          command = "./localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret} -s #{spreadsheetName}"
+          if spreadsheetId 
+            command << " --spreadsheet-id=#{spreadsheetId}"
+          end
+          command << " #{platformParameter} #{projectDir}#{localizablesDir} #{extraParams}"
           if markUnused 
             command << " -c -m"
           end
@@ -105,6 +109,10 @@ module Fastlane
                                        description: "Whether to extend String or use LocalizedString struct",
                                        optional: true,
                                        is_string: false),
+        FastlaneCore::ConfigItem.new(key: :spreadsheet_id,
+                                       env_name: "EK_LOCALES_GOOGLE_SPREADSHEET_ID",
+                                       description: "Id of spreadsheet. in https://docs.google.com/spreadsheets/d/1L3-kvwJblyW_TvjYD-7pE-AXxw5_bkb6S_MljuIPVL0/edit it will be: 1L3-kvwJblyW_TvjYD-7pE-AXxw5_bkb6S_MljuIPVL0",
+                                       optional: true),
         FastlaneCore::ConfigItem.new(key: :ios_suffix,
                                        env_name: "EK_LOCALES_IOS_SUFFIX",
                                        description: "Suffix to use on generated variables",
@@ -126,6 +134,7 @@ module Fastlane
             google_client_id: 'someid-somehash.apps.googleusercontent.com',
             google_client_secret: 'someHexa64Secret'',
             spreadsheet_name: 'myProject',
+            spreadsheet_id: '1L3-kvwJblyW_TvjYD-7pE-AXxw5_bkb6S_MljuIPVL0',
             localizables_dir: 'myProject/i18n/',
             repository_path: 'some/temporal/subdir/',
             ios_extension: true,
