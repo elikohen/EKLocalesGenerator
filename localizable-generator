@@ -153,6 +153,7 @@ options = Parser.new do |p|
   p.option :client_id, 'google Client id', :default => ''
   p.option :client_secret, 'google Client secret', :default => ''
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
+  p.option :just_credentials, 'If enabled, script just creates google credentials', :default => false
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
   p.option :ios_constants_extension, 'Whether to extend String or use LocalizedString struct', :default => false
@@ -163,10 +164,13 @@ options = Parser.new do |p|
   p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
   p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
+
 end.process!
 
 client_id = options[:client_id]
 client_secret = options[:client_secret]
+spreadsheet = options[:spreadsheet]
+just_credentials = options[:just_credentials]
 ios_path = options[:output_ios]
 ios_constants_name = options[:ios_constants_name]
 ios_constants_extension = options[:ios_constants_extension]
@@ -174,7 +178,6 @@ ios_constants_sufix = options[:ios_constants_sufix]
 ios_just_swift = options[:ios_just_swift]
 ios_add_base = options[:ios_add_base]
 android_path = options[:output_android]
-spreadsheet = options[:spreadsheet]
 check_unused = options[:check_unused]
 check_unused_mark = options[:check_unused_mark]
 keep_keys = options[:keep_keys]
@@ -182,8 +185,8 @@ keep_keys = options[:keep_keys]
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
 
-show_error 'You must provide a Client id and secret' if client_id.blank? || client_secret.blank?
-show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios
+show_error 'You must provide a Client id and secret' if (client_id.blank? || client_secret.blank?) && !just_credentials
+show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || just_credentials
 
 # Get the spreadsheet from Google Drive
 puts 'Logging in to Google Drive...'
@@ -198,13 +201,18 @@ rescue
   exit -1
 end
 
+if just_credentials
+  puts 'Created and stored credentials!'.cyan
+  exit 0
+end
+
 # Recover our spreadsheets
 puts 'Logged.'.cyan
 puts "Searching for #{spreadsheet}..."
 matching_spreadsheets = []
 
-session.spreadsheets.each do |s|
-  matching_spreadsheets << s if s.title.downcase.include?(spreadsheet.downcase) && s.title.include?('[Localizables]')
+session.spreadsheets(q: "name contains '[Localizables]'").each do |s|
+  matching_spreadsheets << s if s.title.downcase.include?(spreadsheet.downcase)
 end
 
 if matching_spreadsheets.count > 1
@@ -216,6 +224,7 @@ elsif matching_spreadsheets.count == 0
 end
 
 found_spreadsheet = matching_spreadsheets[0]
+
 puts "Found one match: #{found_spreadsheet.title}".cyan
 
 # Processing the spreadsheet

@@ -47,19 +47,27 @@ module Fastlane
           projectDir = projectDir+pathToRepo
         end
 
-        scriptDir = "#{Dir.home}/.ekscripts/locales-generator/"
+        scriptDir = ".ekscripts/locales-generator/"
         if File.exist?(scriptDir)
           Actions.sh "cd #{scriptDir} && git checkout . && git pull > /dev/null"
         else
           Actions.sh "mkdir -p #{scriptDir} && git clone https://github.com/elikohen/EKLocalesGenerator.git #{scriptDir} > /dev/null && cd #{scriptDir} && bundle install"
         end
 
-        command = "./localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret}"
-        command << " -s #{spreadsheetName} #{platformParameter} #{projectDir}#{localizablesDir} #{extraParams}"
-        if markUnused 
-          command << " -c -m"
+        #Checking stored credentials (if not present it requires the script to be run standalone)
+        credsFile = Dir.home + "/.locgen/#{spreadsheetName}_key.json"
+        if !File.file?(credsFile)
+          UI.message "Google credentials file not present. You must copy and execute following scrip call\n"
+          UI.message "#{scriptDir}localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret} -s #{spreadsheetName} -j".blue
+          UI.message "\nIndependently and then call this fastlane action again"
+        else
+          command = "./localizable-generator --client-id=#{clientId} --client-secret=#{clientSecret}"
+          command << " -s #{spreadsheetName} #{platformParameter} #{projectDir}#{localizablesDir} #{extraParams}"
+          if markUnused 
+            command << " -c -m"
+          end
+          Actions.sh "cd #{scriptDir} && #{command}"
         end
-        Actions.sh "cd #{scriptDir} && #{command}"
 
       end
 
