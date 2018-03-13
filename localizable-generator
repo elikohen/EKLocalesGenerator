@@ -214,6 +214,7 @@ matching_spreadsheets = []
 
 if !spreadsheet_id.empty? 
   puts "Searching for Spreadsheet id: #{spreadsheet_id}"
+
   found_spreadsheet = session.spreadsheet_by_key(spreadsheet_id)
   show_error 'Invalid spreadsheet id' if !found_spreadsheet
 else
