@@ -210,13 +210,15 @@ end
 
 # Recover our spreadsheets
 puts 'Logged.'.cyan
-puts "Searching for #{spreadsheet}..."
 matching_spreadsheets = []
 
 if !spreadsheet_id.empty? 
+  puts "Searching for Spreadsheet id: #{spreadsheet_id}"
   found_spreadsheet = session.spreadsheet_by_key(spreadsheet_id)
   show_error 'Invalid spreadsheet id' if !found_spreadsheet
 else
+  puts "Searching for spreadsheet name: #{spreadsheet}"
+
   session.spreadsheets(q: "name contains '[Localizables]'").each do |s|
     matching_spreadsheets << s if s.title.downcase.include?(spreadsheet.downcase)
   end
@@ -232,7 +234,6 @@ else
   found_spreadsheet = matching_spreadsheets[0]
 end
 
-found_spreadsheet = session.spreadsheet_by_key("1xNJxI16EjE6RzRnoht8RtDBzplq7c7cxxgmZl4qMY1I")
 exit 1 if !found_spreadsheet
 puts "Found one match: #{found_spreadsheet.title}".cyan
 
