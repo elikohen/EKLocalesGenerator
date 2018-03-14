@@ -22,12 +22,15 @@ import_from_git(url: 'git@github.com:elikohen/EKLocalesGenerator.git', path: 'fa
 
 So now you're ready to use the ek_locales action. It contains the following parameters:
 
-- *spreadsheet_name*: Name of spreadsheet. I.E. if spreadsheet is '[Localizables] myProject', you mustf set 'myProject'                           
+- *spreadsheet_name*: Name of spreadsheet. I.E. if spreadsheet is '[Localizables] myProject', you must set `myProject`
+- *spreadsheet_id*: [Optional*] Id of spreadsheet. I.E. if url is _https://docs.google.com/spreadsheets/d/1G5vMNUlm7HlsO1MMUShlUdsm6DDZI4L4HZmvOaWcqlw/edit?usp=sharing_ you must set `1G5vMNUlm7HlsO1MMUShlUdsm6DDZI4L4HZmvOaWcqlw`. ***Note**: If you are using company **team drive** to place the spreadsheet this becomes **mandatory** as the script cannot search inside team drives.
 - *localizables_dir*: Directory of .lproj files on iOS and res directory on android                      
 - *google\_client\_id*: [Optional] If you want to use your own google apps account with google drive this is the Google apps client id 
 - *google\_client\_secret*: [Optional] If you want to use your own google apps account with google drive this is the Google apps client secret of the oauth key
 - *repository_path*: [optional] Path to the repository if it's located on a subfolder. Usefull if you're using c.i. and it checkouts a specific branch to a temporary folder-
 - *mark_unused*: [Optional] Mark all the unused strings in spreadsheet
+- *ios_extension*: [Optional] When using iOS and swift, create all helpers as an extension of `String` instead of using the `Localizables` class. (default: 
+- *ios_suffix*: [optional] Suffix to append to all vars and function helpers.
 
 examples:
 
