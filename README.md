@@ -125,6 +125,15 @@ It is important to maintain the Spreadsheet file with colors (on important rows,
 
 Common issues
 ----------------------------------
+### Cannot install nokogiri gem
+In their [home page](www.nokogiri.org) you can find an excellent [tutorial](http://www.nokogiri.org/tutorials/installing_nokogiri.html#install_with_included_libraries__recommended_). In my case I had a problem with conflicting libxml2 libraries because of homebrew usage. The solution they propose of unlinking `xz` and linking it again worked perfectly:
+
+	brew unlink xz
+	sudo gem install nokogiri
+	brew link xz
+
+
+### Open ssl issue
 Some of you are having a ssl issue related with OPENSSLv3 and rvm. This is related of ruby using a the wrong system certificates. If you fall into that please reinstall your current ruby version using the following command:
 
 `rvm reinstall [yourversion] --disable-binary`
