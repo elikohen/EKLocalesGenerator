@@ -184,4 +184,5 @@ This is a helper script to place on your root project folder that downloads loca
 I hope this will help you in your projects. If you have any doubt just open an Issue and ask for it.
 
 
-Note: Thanks to [Christian Ronningen](https://github.com/ChristianRonningen) for the support!
+- Initial version created in [Mobivery](https://github.com/mobivery) (now [AuroraLabs](http://www.auroralabs.es/?lang=es)) with love
+- Thanks also to [Christian Ronningen](https://github.com/ChristianRonningen) for the support!
