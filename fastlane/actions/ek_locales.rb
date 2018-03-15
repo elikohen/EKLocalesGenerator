@@ -50,9 +50,9 @@ module Fastlane
 
         scriptDir = ".ekscripts/locales-generator/"
         if File.exist?(scriptDir)
-          Actions.sh "cd #{scriptDir} && git checkout . && git pull > /dev/null"
+          Actions.sh "cd #{scriptDir} && git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))"
         else
-          Actions.sh "mkdir -p #{scriptDir} && git clone https://github.com/elikohen/EKLocalesGenerator.git #{scriptDir} > /dev/null && cd #{scriptDir} && bundle install"
+          Actions.sh "mkdir -p #{scriptDir} && git clone https://github.com/elikohen/EKLocalesGenerator.git #{scriptDir} > /dev/null && cd #{scriptDir} && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)) && bundle install"
         end
 
         #Checking stored credentials (if not present it requires the script to be run standalone)
@@ -134,7 +134,7 @@ module Fastlane
             google_client_id: 'someid-somehash.apps.googleusercontent.com',
             google_client_secret: 'someHexa64Secret'',
             spreadsheet_name: 'myProject',
-            spreadsheet_id: '1L3-kvwJblyW_TvjYD-7pE-AXxw5_bkb6S_MljuIPVL0',
+            spreadsheet_id: '1G5vMNUlm7HlsO1MMUShlUdsm6DDZI4L4HZmvOaWcqlw',
             localizables_dir: 'myProject/i18n/',
             repository_path: 'some/temporal/subdir/',
             ios_extension: true,

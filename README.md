@@ -45,8 +45,11 @@ ek_locales(
 	google_client_id: 'someid-somehash.apps.googleusercontent.com',
 	google_client_secret: 'someHexa64Secret'',
 	spreadsheet_name: 'myProject',
+	spreadsheet_id: '1G5vMNUlm7HlsO1MMUShlUdsm6DDZI4L4HZmvOaWcqlw',
 	localizables_dir: 'myProject/i18n/',
 	repository_path: 'some/temporal/subdir/',
+	ios_extension: true,
+	ios_suffix: 'Localized',
 	mark_unused: true
 )
 ```
@@ -70,22 +73,29 @@ localizable-generator Usage
 
 Those are the generator parameters, you can show all them by typing -h
 
-    localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>
-        --client-id                  google Client id
-    -l, --client-secret              google Client secret
-    -s example-spreadsheet,          Spreadsheet containing the localization info
-        --spreadsheet
-    -i /the_path/Localizables/,      Path to the iOS localization directory
-        --output-ios
-    -a /the_path/res/,               Path to the resource directory of an Android project
-        --output-android
-    -j /the_path/strings/,           Path to the JSON localization directory
-        --output-json
-    -k, --[no-]keep-keys             Whether to maintain original keys or not
-    -c, --[no-]check-unused          Whether to check unused keys on project
-    -m, --[no-]check-unused-mark     If checking keys -> mark them on spreadsheet prepending [u]
-    -h, --help                       Show this message
-    -v, --version                    Print version
+	localizable-generator (c) 2018 EKGDev <elikohen@gmail.com>
+	        --client-id                  google Client id
+	    -l, --client-secret              google Client secret
+	    -s example-spreadsheet,          Spreadsheet containing the localization info
+	        --spreadsheet
+	    -p, --spreadsheet-id             Spreadsheet id shown in the path of the url (just before /edit)
+	    -j, --[no-]just-credentials      [Optional] If enabled, script just creates google credentials
+	    -i /the_path/Localizables/,      Path to the iOS localization directory
+	        --output-ios
+	    -n LocalizedConstants,           [Optional] Constants localizable name for iOS
+	        --ios-constants-name
+	    -o                               [Optional] Whether to extend String or use LocalizedString struct
+	        --[no-]ios-constants-extension
+	    -t, --ios-constants-sufix        [Optional] sufix to use on elements
+	    -u, --[no-]ios-just-swift        [Optional] Whether to build constants just for swift
+	        --[no-]ios-add-base          [Optional] Whether to add Base.lproj linked with the default language
+	    -a /the_path/res/,               Path to the resource directory of an Android project
+	        --output-android
+	    -k, --[no-]keep-keys             [Optional] Whether to maintain original keys or not
+	    -c, --[no-]check-unused          [Optional] Whether to check unused keys on project
+	    -m, --[no-]check-unused-mark     [Optional] When checking keys (--check-unused) -> mark them on spreadsheet prepending [u]
+	    -h, --help                       Show this message
+	    -v, --version                    Print version
 
 It might sound weird or difficult but I'll explain them
 
@@ -98,13 +108,17 @@ It might sound weird or difficult but I'll explain them
 
 An example will show everything better. 
 
-This will generate just iOS localisables of a "radares" app.
+- This will generate just iOS localisables of a "MyApp" ios project located under user/workspace using a spreadsheet called `[Localizables] MyApp`
 
-	localizable-generator -u some_path_to.json -s radares -i /Users/mrm/Documents/workspace/Radares-iOS/Radares/Resources/Localizables
+		localizable-generator --client-id=someid-somehash.apps.googleusercontent.com --client-secret=someHexa64Secret -s MyApp -i ~/workspace/MyApp/res/i18n/
+		
+- This will generate just iOS localisables of a "MyApp" ios project located under user/workspace using a spreadsheet whose id is `1G5vMNUlm7HlsO1MMUShlUdsm6DDZI4L4HZmvOaWcqlw`
 
-And this will generate both iOS and Android
+		localizable-generator --client-id=someid-somehash.apps.googleusercontent.com --client-secret=someHexa64Secret -s MyApp --spreadsheet-id= 1G5vMNUlm7HlsO1MMUShlUdsm6DDZI4L4HZmvOaWcqlw -i ~/workspace/MyApp/res/i18n/
+	
+- And this will generate both iOS and Android
 
-	localizable-generator -u some_path_to.json -s radares -i /Users/mrm/Documents/workspace/Radares-iOS/Radares/Resources/Localizables -a /Users/mrm/Documents/workspace/Radares-Android/res
+		localizable-generator --client-id=someid-somehash.apps.googleusercontent.com --client-secret=someHexa64Secret -s MyApp -i ~/workspace/MyAppIOS/res/i18n/ -a ~/workspace/MyAppAndroid/app/res/
 
 
 Google Drive spreadseet
@@ -151,19 +165,17 @@ This is a helper script to place on your root project folder that downloads loca
     if [ -d "$dir" -a ! -h "$dir" ]
     then
       echo "$dir found, updating script"
-      cd "$dir"
-      git pull > /dev/null
+      cd "$dir" && git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
       echo "Updated. NOTE: if some gems are missing go to $dir and type 'bundle update'"
     else
       echo "Error: $dir not found, creating it and cloning script"
       mkdir -p "$dir"
-      git clone "https://github.com/elikohen/EKLocalesGenerator.git" "$dir" > /dev/null
-      cd "$dir"
-      bundle install
+      git clone "https://github.com/elikohen/EKLocalesGenerator.git" "$dir" > /dev/null && cd "$dir" && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)) && bundle install
     fi
       
     cd "$dir"
-    ./localizable-generator -u "$projectDir/client_secret_localizables.json" -s Project_name -a "$projectDir/path_that_contains_res_folder/" $@
+    
+    ./localizable-generator --client-id=someid-somehash.apps.googleusercontent.com --client-secret=someHexa64Secret -s Project_name -i "$projectDir/path_where_Localizable.strings_is_placed/" $@
     cd "$projectDir"
 
 

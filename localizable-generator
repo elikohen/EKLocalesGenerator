@@ -145,26 +145,26 @@ end
 
 # Parsing and commandline checks
 
-show_error 'No parameters specified. Use the flag --help to see them all.' unless ARGV.size > 0
+show_error 'No parameters specified. Use the flag -h to see them all.' unless ARGV.size > 0
 
 options = Parser.new do |p|
-  p.banner = 'localizable-generator (c) 2013 EKGDev <elikohen@gmail.com>'
-  p.version = '0.3'
+  p.banner = 'localizable-generator (c) 2018 EKGDev <elikohen@gmail.com>'
+  p.version = '1.0.0'
   p.option :client_id, 'google Client id', :default => ''
   p.option :client_secret, 'google Client secret', :default => ''
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
   p.option :spreadsheet_id, 'Spreadsheet id shown in the path of the url (just before /edit)', :default => ''
-  p.option :just_credentials, 'If enabled, script just creates google credentials', :default => false
+  p.option :just_credentials, '[Optional] If enabled, script just creates google credentials', :default => false
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
-  p.option :ios_constants_name, 'Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
-  p.option :ios_constants_extension, 'Whether to extend String or use LocalizedString struct', :default => false
-  p.option :ios_constants_sufix, 'sufix to use on elements', :default => ''
-  p.option :ios_just_swift, 'Whether to build constants just for swift', :default => true
-  p.option :ios_add_base, 'Whether to add Base.lproj linked with the default language', :default => true
+  p.option :ios_constants_name, '[Optional] Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
+  p.option :ios_constants_extension, '[Optional] Whether to extend String or use LocalizedString struct', :default => false
+  p.option :ios_constants_sufix, '[Optional] sufix to use on elements', :default => ''
+  p.option :ios_just_swift, '[Optional] Whether to build constants just for swift', :default => true
+  p.option :ios_add_base, '[Optional] Whether to add Base.lproj linked with the default language', :default => true
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
-  p.option :keep_keys, 'Whether to maintain original keys or not', :default => false, :short => 'k'
-  p.option :check_unused, 'Whether to check unused keys on project', :default => false , :short => 'c'
-  p.option :check_unused_mark, 'If checking keys -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
+  p.option :keep_keys, '[Optional] Whether to maintain original keys or not', :default => false, :short => 'k'
+  p.option :check_unused, '[Optional] Whether to check unused keys on project', :default => false , :short => 'c'
+  p.option :check_unused_mark, '[Optional] When checking keys (--check-unused) -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
 
 end.process!
 
