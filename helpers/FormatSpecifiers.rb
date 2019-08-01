@@ -22,7 +22,7 @@ class FormatSpecifiers
         args = []
         for i in 0..@specifiers.length-1 
             type = type_for_specifier(@specifiers[i])
-            args.push("var#{i+1}: #{type}")
+            args.push("_ var#{i+1}: #{type}")
         end
         return args.join(", ")
     end

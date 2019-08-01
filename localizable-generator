@@ -46,7 +46,7 @@ end
 def generate_ios_constants(target_directory, filename)
   @filename = filename
   process_template 'ios_constant_localizable.erb', target_directory, "#{filename}.h"
-  puts ' > '+'LocalizableConstants.h'.yellow
+  puts ' > '+"#{filename}.h".yellow
 end
 
 def generate_ios_constants_swift(target_directory, filename, extension, sufix)
@@ -54,7 +54,7 @@ def generate_ios_constants_swift(target_directory, filename, extension, sufix)
   @isExtension = extension
   @sufix = sufix
   process_template 'ios_constant_localizable_swift.erb', target_directory, "#{filename}.swift"
-  puts ' > '+'LocalizableConstantSwift.swift'.yellow
+  puts ' > '+"#{filename}.swift".yellow
 end
 
 # Generation for Android
@@ -148,8 +148,8 @@ end
 show_error 'No parameters specified. Use the flag -h to see them all.' unless ARGV.size > 0
 
 options = Parser.new do |p|
-  p.banner = 'localizable-generator (c) 2018 EKGDev <elikohen@gmail.com>'
-  p.version = '1.0.0'
+  p.banner = 'localizable-generator (c) 2019 EKGDev <elikohen@gmail.com>'
+  p.version = '2.1.0'
   p.option :client_id, 'google Client id', :default => ''
   p.option :client_secret, 'google Client secret', :default => ''
   p.option :spreadsheet, 'Spreadsheet containing the localization info', :default => 'example-spreadsheet'
