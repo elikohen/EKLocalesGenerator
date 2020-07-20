@@ -10,7 +10,7 @@ class Term
   end
 
   def store_value(lang, text)
-    @values.store lang, text
+    @values.store lang, text.strip()
     if !@format_specifiers
       @format_specifiers = FormatSpecifiers.new(text)
     end
