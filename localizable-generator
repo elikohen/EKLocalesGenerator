@@ -7,6 +7,7 @@ require 'fileutils'
 require 'micro-optparse'
 gem 'google_drive', '>=2.0.0'
 require 'google_drive'
+require 'json'
 
 require_relative 'helpers/string'
 require_relative 'helpers/term'
@@ -67,10 +68,20 @@ end
 
 # Generation for JSON
 
-def generate_json(languages, target_directory)
-  @langs = languages
-  process_template 'json_localizable.erb', target_directory, 'localizables.json'
-  puts ' > '+languages.join(', ').yellow
+def generate_json(languages, target_file)
+  result = Hash.new
+  languages.each do |lang|
+    lang_values = Hash.new
+    @terms.each do |term| 
+      lang_values.store term.keyword_android, term.values_json[lang] unless term.is_comment?
+    end
+    result.store lang, lang_values
+  end
+
+  File.open(target_file,"w") do |f|
+    f.write(JSON.pretty_generate(result))
+  end
+  puts ' > '+languages.join(', ').yellow  
 end
 
 #Prints on screen all the unused keys and also marks that keys on spreadsheet as unused
@@ -162,6 +173,7 @@ options = Parser.new do |p|
   p.option :ios_just_swift, '[Optional] Whether to build constants just for swift', :default => true
   p.option :ios_add_base, '[Optional] Whether to add Base.lproj linked with the default language', :default => true
   p.option :output_android, 'Path to the resource directory of an Android project', :default => '/the_path/res/', :short => 'a'
+  p.option :output_json, 'Path to the resource file of the output as json', :default => '/the_path/localizables.json', :short => 'j'
   p.option :keep_keys, '[Optional] Whether to maintain original keys or not', :default => false, :short => 'k'
   p.option :check_unused, '[Optional] Whether to check unused keys on project', :default => false , :short => 'c'
   p.option :check_unused_mark, '[Optional] When checking keys (--check-unused) -> mark them on spreadsheet prepending [u]', :default => false , :short => 'm'
@@ -180,15 +192,17 @@ ios_constants_sufix = options[:ios_constants_sufix]
 ios_just_swift = options[:ios_just_swift]
 ios_add_base = options[:ios_add_base]
 android_path = options[:output_android]
+json_file = options[:output_json]
 check_unused = options[:check_unused]
 check_unused_mark = options[:check_unused_mark]
 keep_keys = options[:keep_keys]
 
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
+has_json = json_file != '/the_path/localizables.json'
 
 show_error 'You must provide a Client id and secret' if (client_id.blank? || client_secret.blank?) && !just_credentials
-show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || just_credentials
+show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || has_json || just_credentials
 
 # Get the spreadsheet from Google Drive
 puts 'Logging in to Google Drive...'
@@ -299,7 +313,7 @@ end
 puts 'Loaded.'.cyan
 
 if has_ios
-  puts 'Generating localizable files for ' + 'iOS'.red + '...'
+  puts 'Generating localizable files for ' + 'iOS'.green + '...'
   @current_lang = default_language
   generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
   generate_ios_constants_swift(ios_path, ios_constants_name, ios_constants_extension, ios_constants_sufix)
@@ -316,6 +330,10 @@ if has_android
     output_path = android_path + 'res/values/' if lang == default_language
     generate_android lang, output_path
   end
+end
+if has_json
+  puts 'Generating localizable files for ' + 'JSON'.green + '...'
+  generate_json languages.keys, json_file
 end
 
 puts 'Done! - Locale generation went smoothly :)'.green
