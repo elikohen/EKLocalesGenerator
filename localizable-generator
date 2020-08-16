@@ -50,10 +50,12 @@ def generate_ios_constants(target_directory, filename)
   puts ' > '+"#{filename}.h".yellow
 end
 
-def generate_ios_constants_swift(target_directory, filename, extension, sufix)
+def generate_ios_constants_swift(target_directory, filename, extension, sufix, function)
   @filename = filename
   @isExtension = extension
   @sufix = sufix
+  @ios_function = function
+  puts ' > '+"#{@ios_function}"
   process_template 'ios_constant_localizable_swift.erb', target_directory, "#{filename}.swift"
   puts ' > '+"#{filename}.swift".yellow
 end
@@ -168,7 +170,9 @@ options = Parser.new do |p|
   p.option :just_credentials, '[Optional] If enabled, script just creates google credentials', :default => false
   p.option :output_ios, 'Path to the iOS localization directory', :default => '/the_path/Localizables/', :short => 'i'
   p.option :ios_constants_name, '[Optional] Constants localizable name for iOS', :default => 'LocalizedConstants', :short => 'n'
-  p.option :ios_constants_extension, '[Optional] Whether to extend String or use LocalizedString struct', :default => false
+  p.option :ios_constants_path, '[Optional] Constants localizable path for iOS', :default => '', :short => 'p'
+  p.option :ios_constants_function, '[Optional] Constants localizable function for iOS', :default => 'NSLocalizedString', :short => 'f'
+  p.option :ios_constants_extension, '[Optional] Whether to extend String or use LocalizedString struct', :default => false, :short => 'x'
   p.option :ios_constants_sufix, '[Optional] sufix to use on elements', :default => ''
   p.option :ios_just_swift, '[Optional] Whether to build constants just for swift', :default => true
   p.option :ios_add_base, '[Optional] Whether to add Base.lproj linked with the default language', :default => true
@@ -187,6 +191,8 @@ spreadsheet_id = options[:spreadsheet_id]
 just_credentials = options[:just_credentials]
 ios_path = options[:output_ios]
 ios_constants_name = options[:ios_constants_name]
+ios_constants_path = options[:ios_constants_path]
+ios_constants_function = options[:ios_constants_function]
 ios_constants_extension = options[:ios_constants_extension]
 ios_constants_sufix = options[:ios_constants_sufix]
 ios_just_swift = options[:ios_just_swift]
@@ -200,6 +206,10 @@ keep_keys = options[:keep_keys]
 has_ios = ios_path != '/the_path/Localizables/'
 has_android = android_path != '/the_path/res/'
 has_json = json_file != '/the_path/localizables.json'
+
+if ios_constants_path.empty?
+  ios_constants_path = ios_path
+end
 
 show_error 'You must provide a Client id and secret' if (client_id.blank? || client_secret.blank?) && !just_credentials
 show_error 'You must provide a iOS, Android or JSON path at least to proceed' unless has_android || has_ios || has_json || just_credentials
@@ -315,8 +325,8 @@ puts 'Loaded.'.cyan
 if has_ios
   puts 'Generating localizable files for ' + 'iOS'.green + '...'
   @current_lang = default_language
-  generate_ios_constants(ios_path, ios_constants_name) unless ios_just_swift
-  generate_ios_constants_swift(ios_path, ios_constants_name, ios_constants_extension, ios_constants_sufix)
+  generate_ios_constants(ios_constants_path, ios_constants_name) unless ios_just_swift
+  generate_ios_constants_swift(ios_constants_path, ios_constants_name, ios_constants_extension, ios_constants_sufix, ios_constants_function)
   languages.keys.each do |lang|
     generate_ios lang, ios_path + "Base.lproj/" if ios_add_base && lang == default_language
     output_path = ios_path + "#{lang}.lproj/"

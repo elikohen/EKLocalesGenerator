@@ -3,7 +3,7 @@ require_relative 'FormatSpecifiers'
 class Term
   def initialize(keyword, comment = nil, keep_key = false)
     @keep_key = keep_key
-    @keyword = keyword
+    @keyword = keyword.gsub('&', '_and_')
     @comment = comment
     @format_specifiers = nil
     @values = Hash.new
