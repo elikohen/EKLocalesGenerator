@@ -10,7 +10,7 @@ Copyright (c) 2019 EKGDev. All rights reserved.
 import Foundation
 
 <% if @isExtension 
-%>extension String { <% else 
+%>public extension String { <% else 
 %>struct <%= @filename %> { <%
 end %>
 <% 
