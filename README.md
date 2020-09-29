@@ -73,24 +73,29 @@ localizable-generator Usage
 
 Those are the generator parameters, you can show all them by typing -h
 
-	localizable-generator (c) 2018 EKGDev <elikohen@gmail.com>
-	        --client-id                  google Client id
+	localizable-generator (c) 2019 EKGDev <elikohen@gmail.com>
+		--client-id                  google Client id
 	    -l, --client-secret              google Client secret
 	    -s example-spreadsheet,          Spreadsheet containing the localization info
-	        --spreadsheet
-	    -p, --spreadsheet-id             Spreadsheet id shown in the path of the url (just before /edit)
-	    -j, --[no-]just-credentials      [Optional] If enabled, script just creates google credentials
+		--spreadsheet
+		--spreadsheet-id             Spreadsheet id shown in the path of the url (just before /edit)
+		--[no-]just-credentials      [Optional] If enabled, script just creates google credentials
 	    -i /the_path/Localizables/,      Path to the iOS localization directory
-	        --output-ios
+		--output-ios
 	    -n LocalizedConstants,           [Optional] Constants localizable name for iOS
-	        --ios-constants-name
-	    -o                               [Optional] Whether to extend String or use LocalizedString struct
-	        --[no-]ios-constants-extension
-	    -t, --ios-constants-sufix        [Optional] sufix to use on elements
+		--ios-constants-name
+	    -p, --ios-constants-path         [Optional] Constants localizable path for iOS
+	    -f NSLocalizedString,            [Optional] Constants localizable function for iOS
+		--ios-constants-function
+	    -x                               [Optional] Whether to extend String or use LocalizedString struct
+		--[no-]ios-constants-extension
+	    -o, --ios-constants-sufix        [Optional] sufix to use on elements
 	    -u, --[no-]ios-just-swift        [Optional] Whether to build constants just for swift
-	        --[no-]ios-add-base          [Optional] Whether to add Base.lproj linked with the default language
+		--[no-]ios-add-base          [Optional] Whether to add Base.lproj linked with the default language
 	    -a /the_path/res/,               Path to the resource directory of an Android project
-	        --output-android
+		--output-android
+	    -j /the_path/localizables.json,  Path to the resource file of the output as json
+		--output-json
 	    -k, --[no-]keep-keys             [Optional] Whether to maintain original keys or not
 	    -c, --[no-]check-unused          [Optional] Whether to check unused keys on project
 	    -m, --[no-]check-unused-mark     [Optional] When checking keys (--check-unused) -> mark them on spreadsheet prepending [u]
