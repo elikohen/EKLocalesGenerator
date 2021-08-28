@@ -24,7 +24,13 @@ end %>
 		elsif term.has_specifiers?
 %>
 	static func <%= term.keyword_iphone_constant_swift %><%= @sufix %>(<%= term.specifiers_args %>) -> String {
-		return String(format: <%= @ios_function %>("<%= term.keyword_iphone %>", comment: ""), <%= term.specifiers_vars %>)
+<%
+		if term.has_tags?
+%>		return <%= @ios_function %>("<%= term.keyword_iphone %>", comment: "").<%= term.replacement_tags %><% 		
+		else
+%>		return String(format: <%= @ios_function %>("<%= term.keyword_iphone %>", comment: ""), <%= term.specifiers_vars %>)<% 		
+		end
+%>
 	}
 <% 
 		else
