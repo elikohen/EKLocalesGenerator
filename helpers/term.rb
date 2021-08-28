@@ -44,12 +44,20 @@ class Term
     @format_specifiers != nil && !@format_specifiers.empty?
   end
 
+  def has_tags?
+    @format_specifiers != nil && @format_specifiers.has_tags?
+  end
+
   def specifiers_args
     return @format_specifiers.format_args
   end
 
   def specifiers_vars
     return @format_specifiers.format_vars
+  end
+
+  def replacement_tags
+    return @format_specifiers.replacement_tags
   end
 
   def is_comment?
