@@ -106,6 +106,10 @@ class Term
       new_value.gsub!(/[%]\d*[s]/) do |w|
         w.gsub!('s','@')
       end
+      if(new_value.start_with?("<![CDATA[")) # to allow reusing android values
+        new_value = new_value.gsub('<![CDATA[', '')
+        new_value = new_value.gsub(']]>', '')
+      end
       iphone_values.store new_language, new_value
     end
     iphone_values
